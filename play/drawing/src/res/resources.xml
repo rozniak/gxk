@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/uk/oddmatics/gxk/samples/drawing">
+    <file>smile.png</file>
+  </gresource>
+</gresources>
