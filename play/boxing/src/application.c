@@ -63,7 +63,7 @@ GxkBoxingApplication* gxk_boxing_application_new(void)
     return GXK_BOXING_APPLICATION(
         g_object_new(
             gxk_boxing_application_get_type(),
-            "application-id", "uk.oddmatics.gxk.samples.hello",
+            "application-id", "uk.oddmatics.gxk.samples.boxing",
             NULL
         )
     );

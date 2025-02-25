@@ -54,7 +54,7 @@ GtkWidget* gxk_boxing_window_new(
         g_object_new(
             GXK_TYPE_BOXING_WINDOW,
             "application", GTK_APPLICATION(app),
-            "title",       "Hello GXK!",
+            "title",       "GXK Border Box Test",
             NULL
         )
     );
