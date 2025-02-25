@@ -59,11 +59,21 @@ static void gxk_custom_widget_snapshot(
 );
 
 static void init_button_slices();
+static void append_texture_aio(
+    GtkSnapshot* snapshot,
+    gint         x,
+    gint         y,
+    gint         width,
+    gint         height,
+    GdkTexture*  tex
+);
 
 //
 // STATIC DATA
 //
-static gboolean    S_INIT = FALSE;
+static const GxkThemeSlices K_SLICES = { 5, 5, 5, 5 };
+
+static gboolean S_INIT = FALSE;
 
 static GdkPixbuf*  S_PIXBUF_SRC = NULL;
 static GdkPixbuf*  S_PIXBUF_BUTTON[GXK_BUTTON_BOX_N_PARTS];
@@ -125,22 +135,85 @@ static void gxk_custom_widget_snapshot(
 
     gtk_widget_get_allocation(widget, &alloc);
 
-    // Draw button
+    // Body
     //
-    graphene_rect_t rect;
-
-    graphene_rect_init(
-        &rect,
-        alloc.x,
-        alloc.y,
-        alloc.width,
-        alloc.height
+    append_texture_aio(
+        snapshot,
+        alloc.x + K_SLICES.left,
+        alloc.y + K_SLICES.top,
+        alloc.width - K_SLICES.left - K_SLICES.right,
+        alloc.height - K_SLICES.top - K_SLICES.bottom,
+        S_TEX_BUTTON[GXK_BUTTON_BOX_BODY]
     );
 
-    gtk_snapshot_append_texture(
+    // Sides
+    //
+    append_texture_aio(
         snapshot,
-        S_TEX_BUTTON[GXK_BUTTON_BOX_BODY],
-        &rect
+        alloc.x + K_SLICES.left,
+        alloc.y,
+        alloc.width - K_SLICES.left - K_SLICES.right,
+        K_SLICES.top,
+        S_TEX_BUTTON[GXK_BUTTON_BOX_SIDE_T]
+    );
+    append_texture_aio(
+        snapshot,
+        alloc.x + alloc.width - K_SLICES.right,
+        alloc.y + K_SLICES.top,
+        K_SLICES.right,
+        alloc.height - K_SLICES.top - K_SLICES.bottom,
+        S_TEX_BUTTON[GXK_BUTTON_BOX_SIDE_R]
+    );
+    append_texture_aio(
+        snapshot,
+        alloc.x + K_SLICES.left,
+        alloc.y + alloc.height - K_SLICES.bottom,
+        alloc.width - K_SLICES.left - K_SLICES.right,
+        K_SLICES.bottom,
+        S_TEX_BUTTON[GXK_BUTTON_BOX_SIDE_B]
+    );
+    append_texture_aio(
+        snapshot,
+        alloc.x,
+        alloc.y + K_SLICES.top,
+        K_SLICES.left,
+        alloc.height - K_SLICES.top - K_SLICES.bottom,
+        S_TEX_BUTTON[GXK_BUTTON_BOX_SIDE_L]
+    );
+
+    // Corners
+    //
+    append_texture_aio(
+        snapshot,
+        alloc.x,
+        alloc.y,
+        K_SLICES.left,
+        K_SLICES.top,
+        S_TEX_BUTTON[GXK_BUTTON_BOX_CORNER_TL]
+    );
+    append_texture_aio(
+        snapshot,
+        alloc.x + alloc.width - K_SLICES.right,
+        alloc.y,
+        K_SLICES.right,
+        K_SLICES.top,
+        S_TEX_BUTTON[GXK_BUTTON_BOX_CORNER_TR]
+    );
+    append_texture_aio(
+        snapshot,
+        alloc.x,
+        alloc.y + alloc.height - K_SLICES.bottom,
+        K_SLICES.left,
+        K_SLICES.bottom,
+        S_TEX_BUTTON[GXK_BUTTON_BOX_CORNER_BL]
+    );
+    append_texture_aio(
+        snapshot,
+        alloc.x + alloc.width - K_SLICES.right,
+        alloc.y + alloc.height - K_SLICES.bottom,
+        K_SLICES.right,
+        K_SLICES.bottom,
+        S_TEX_BUTTON[GXK_BUTTON_BOX_CORNER_BR]
     );
 }
 
@@ -159,10 +232,6 @@ GtkWidget* gxk_custom_widget_new(void)
 //
 static void init_button_slices()
 {
-    // Hard coded slices - 5px a side
-    //
-    GxkThemeSlices slices = { 5, 5, 5, 5 };
-
     // Load the main image
     //
     S_PIXBUF_SRC =
@@ -176,14 +245,98 @@ static void init_button_slices()
     S_PIXBUF_BUTTON[GXK_BUTTON_BOX_BODY] =
         gdk_pixbuf_new_subpixbuf(
             S_PIXBUF_SRC,
-            slices.left,
-            slices.top,
-            gdk_pixbuf_get_width(S_PIXBUF_SRC) - slices.left - slices.right,
-            gdk_pixbuf_get_height(S_PIXBUF_SRC) - slices.top - slices.bottom
+            K_SLICES.left,
+            K_SLICES.top,
+            gdk_pixbuf_get_width(S_PIXBUF_SRC) - K_SLICES.left - K_SLICES.right,
+            gdk_pixbuf_get_height(S_PIXBUF_SRC) - K_SLICES.top - K_SLICES.bottom
+        );
+
+    S_PIXBUF_BUTTON[GXK_BUTTON_BOX_SIDE_T] =
+        gdk_pixbuf_new_subpixbuf(
+            S_PIXBUF_SRC,
+            K_SLICES.left,
+            0,
+            gdk_pixbuf_get_width(S_PIXBUF_SRC) - K_SLICES.left - K_SLICES.right,
+            K_SLICES.top
+        );
+    S_PIXBUF_BUTTON[GXK_BUTTON_BOX_SIDE_R] =
+        gdk_pixbuf_new_subpixbuf(
+            S_PIXBUF_SRC,
+            gdk_pixbuf_get_width(S_PIXBUF_SRC) - K_SLICES.right,
+            K_SLICES.top,
+            K_SLICES.right,
+            gdk_pixbuf_get_height(S_PIXBUF_SRC) - K_SLICES.top - K_SLICES.bottom
+        );
+    S_PIXBUF_BUTTON[GXK_BUTTON_BOX_SIDE_B] =
+        gdk_pixbuf_new_subpixbuf(
+            S_PIXBUF_SRC,
+            K_SLICES.left,
+            gdk_pixbuf_get_height(S_PIXBUF_SRC) - K_SLICES.bottom,
+            gdk_pixbuf_get_width(S_PIXBUF_SRC) - K_SLICES.left - K_SLICES.right,
+            K_SLICES.bottom
+        );
+    S_PIXBUF_BUTTON[GXK_BUTTON_BOX_SIDE_L] =
+        gdk_pixbuf_new_subpixbuf(
+            S_PIXBUF_SRC,
+            0,
+            K_SLICES.top,
+            K_SLICES.left,
+            gdk_pixbuf_get_height(S_PIXBUF_SRC) - K_SLICES.top - K_SLICES.bottom
+        );
+
+    S_PIXBUF_BUTTON[GXK_BUTTON_BOX_CORNER_TL] =
+        gdk_pixbuf_new_subpixbuf(
+            S_PIXBUF_SRC,
+            0,
+            0,
+            K_SLICES.left,
+            K_SLICES.top
+        );
+    S_PIXBUF_BUTTON[GXK_BUTTON_BOX_CORNER_TR] =
+        gdk_pixbuf_new_subpixbuf(
+            S_PIXBUF_SRC,
+            gdk_pixbuf_get_width(S_PIXBUF_SRC) - K_SLICES.right,
+            0,
+            K_SLICES.right,
+            K_SLICES.top
+        );
+    S_PIXBUF_BUTTON[GXK_BUTTON_BOX_CORNER_BL] =
+        gdk_pixbuf_new_subpixbuf(
+            S_PIXBUF_SRC,
+            0,
+            gdk_pixbuf_get_height(S_PIXBUF_SRC) - K_SLICES.bottom,
+            K_SLICES.left,
+            K_SLICES.bottom
+        );
+    S_PIXBUF_BUTTON[GXK_BUTTON_BOX_CORNER_BR] =
+        gdk_pixbuf_new_subpixbuf(
+            S_PIXBUF_SRC,
+            gdk_pixbuf_get_width(S_PIXBUF_SRC) - K_SLICES.right,
+            gdk_pixbuf_get_height(S_PIXBUF_SRC) - K_SLICES.bottom,
+            K_SLICES.right,
+            K_SLICES.bottom
         );
 
     // Create textures
     //
-    S_TEX_BUTTON[GXK_BUTTON_BOX_BODY] =
-        gdk_texture_new_for_pixbuf(S_PIXBUF_BUTTON[GXK_BUTTON_BOX_BODY]);
+    for (gint i = 0; i < GXK_BUTTON_BOX_N_PARTS; i++)
+    {
+        S_TEX_BUTTON[i] = gdk_texture_new_for_pixbuf(S_PIXBUF_BUTTON[i]);
+    }
+}
+
+static void append_texture_aio(
+    GtkSnapshot* snapshot,
+    gint         x,
+    gint         y,
+    gint         width,
+    gint         height,
+    GdkTexture*  tex
+)
+{
+    graphene_rect_t rect;
+
+    graphene_rect_init(&rect, x, y, width, height);
+
+    gtk_snapshot_append_texture(snapshot, tex, &rect);
 }
