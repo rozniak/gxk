@@ -1,5 +1,6 @@
 #include <glib.h>
 #include <gtk/gtk.h>
+#include <gxk.h>
 
 #include "application.h"
 #include "shim.h"
@@ -10,7 +11,7 @@
 //
 struct _GxkHelloApplication
 {
-    GtkApplication __parent__;
+    GxkApplication __parent__;
 };
 
 //
@@ -26,7 +27,7 @@ static void gxk_hello_application_activate(
 G_DEFINE_TYPE(
     GxkHelloApplication,
     gxk_hello_application,
-    GTK_TYPE_APPLICATION
+    GXK_TYPE_APPLICATION
 )
 
 static void gxk_hello_application_class_init(

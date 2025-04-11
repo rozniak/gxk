@@ -1,5 +1,4 @@
 #include <glib.h>
-#include <gxk.h>
 
 #include "application.h"
 
@@ -8,8 +7,6 @@ int main(
     char* argv[]
 )
 {
-    gxk_init(); // Testing
-
     GxkHelloApplication* app = gxk_hello_application_new();
     int                  status;
 

@@ -16,6 +16,8 @@ pkg_check_modules(GTK4 REQUIRED gtk4)
 
 add_library(
     gxk-4
+    src/application.c
+    public/application.h
     src/init.c
     public/init.h
 )

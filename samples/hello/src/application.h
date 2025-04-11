@@ -3,6 +3,7 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
+#include <gxk.h>
 
 //
 // GOBJECT BOILERPLATE
@@ -14,7 +15,7 @@ G_DECLARE_FINAL_TYPE(
     gxk_hello_application,
     GXK,
     HELLO_APPLICATION,
-    GtkApplication
+    GxkApplication
 )
 
 //
