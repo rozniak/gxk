@@ -61,6 +61,11 @@ static void gxk_demo_window_init(
         GTK_WINDOW(self),
         GTK_WIDGET(gtk_builder_get_object(builder, "main-box"))
     );
+    gtk_window_set_default_size(
+        GTK_WINDOW(self),
+        450,
+        350
+    );
 
     g_object_unref(builder);
 
