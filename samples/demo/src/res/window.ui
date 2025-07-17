@@ -50,6 +50,11 @@
           <attribute name="icon">edit-delete</attribute>
         </item>
       </section>
+
+      <item>
+        <attribute name="label">Select Stuff</attribute>
+        <attribute name="action">win.select-stuff</attribute>
+      </item>
     </submenu>
 
     <submenu>
@@ -97,7 +102,10 @@
     </child>
 
     <child>
-      <object class="GtkDrawingArea" />
+      <object class="GtkDrawingArea">
+        <property name="valign">GTK_ALIGN_FILL</property>
+        <property name="vexpand">True</property>
+      </object>
     </child>
   </object>
 </interface>

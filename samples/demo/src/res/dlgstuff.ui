@@ -1,0 +1,79 @@
+<interface>
+  <object class="GtkBox" id="main-box">
+    <property name="orientation">vertical</property>
+
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">horizontal</property>
+        <property name="vexpand">True</property>
+        <property name="valign">GTK_ALIGN_FILL</property>
+
+        <child>
+          <object class="GtkBox">
+            <property name="hexpand">True</property>
+            <property name="halign">GTK_ALIGN_FILL</property>
+            <property name="orientation">vertical</property>
+
+            <child>
+              <object class="GtkCheckButton" id="radio-master">
+                <property name="label">Something</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkCheckButton">
+                <property name="group">radio-master</property>
+                <property name="label">Someone</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkCheckButton">
+                <property name="group">radio-master</property>
+                <property name="label">Somewhere</property>
+              </object>
+            </child>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkBox">
+            <property name="hexpand">True</property>
+            <property name="halign">GTK_ALIGN_FILL</property>
+            <property name="orientation">vertical</property>
+
+            <child>
+              <object class="GtkCheckButton">
+                <property name="label">Burger</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkCheckButton">
+                <property name="label">Chips</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">horizontal</property>
+
+        <child>
+          <object class="GtkButton">
+            <property name="label">OK</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label">Cancel</property>
+          </object>
+        </child>
+
+        <style>
+          <class name="gxk-button-box" />
+        </style>
+      </object>
+    </child>
+  </object>
+</interface>
