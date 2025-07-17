@@ -1,0 +1,103 @@
+<interface>
+  <menu id="menu">
+    <submenu>
+      <attribute name="label">File</attribute>
+
+      <item>
+        <attribute name="label">New</attribute>
+        <attribute name="icon">file-new</attribute>
+      </item>
+
+      <section>
+        <item>
+          <attribute name="label">Open</attribute>
+          <attribute name="icon">file-open</attribute>
+        </item>
+        <item>
+          <attribute name="label">Save</attribute>
+          <attribute name="icon">file-save</attribute>
+        </item>
+        <item>
+          <attribute name="label">Save As</attribute>
+          <attribute name="icon">file-save-as</attribute>
+        </item>
+      </section>
+
+      <item>
+        <attribute name="label">Exit</attribute>
+        <attribute name="icon">exit</attribute>
+      </item>
+    </submenu>
+
+    <submenu>
+      <attribute name="label">Edit</attribute>
+
+      <section>
+        <item>
+          <attribute name="label">Cut</attribute>
+          <attribute name="icon">edit-cut</attribute>
+        </item>
+        <item>
+          <attribute name="label">Copy</attribute>
+          <attribute name="icon">edit-copy</attribute>
+        </item>
+        <item>
+          <attribute name="label">Paste</attribute>
+          <attribute name="icon">edit-paste</attribute>
+        </item>
+        <item>
+          <attribute name="label">Delete</attribute>
+          <attribute name="icon">edit-delete</attribute>
+        </item>
+      </section>
+    </submenu>
+
+    <submenu>
+      <attribute name="label">Help</attribute>
+
+      <item>
+        <attribute name="label">About</attribute>
+      </item>
+    </submenu>
+  </menu>
+
+  <object class="GtkBox" id="main-box">
+    <property name="orientation">vertical</property>
+
+    <child>
+      <object class="GtkPopoverMenuBar">
+        <property name="menu-model">menu</property>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">horizontal</property>
+
+        <child>
+          <object class="GtkButton">
+            <property name="label">New</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label">Open</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label">Save</property>
+          </object>
+        </child>
+
+        <style>
+          <class name="toolbar" />
+        </style>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkDrawingArea" />
+    </child>
+  </object>
+</interface>
