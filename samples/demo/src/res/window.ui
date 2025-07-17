@@ -102,7 +102,7 @@
     </child>
 
     <child>
-      <object class="GtkDrawingArea">
+      <object class="GtkDrawingArea" id="drawing">
         <property name="valign">GTK_ALIGN_FILL</property>
         <property name="vexpand">True</property>
       </object>

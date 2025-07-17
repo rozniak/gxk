@@ -1,3 +1,4 @@
+#include <cairo.h>
 #include <glib.h>
 #include <gtk/gtk.h>
 
@@ -12,6 +13,14 @@ static void action_select_stuff(
     GSimpleAction* action,
     GVariant*      parameter,
     gpointer       user_data
+);
+
+static void cb_drawing_area_draw(
+    GtkDrawingArea* drawing_area,
+    cairo_t*        cr,
+    gint            width,
+    gint            height,
+    gpointer        user_data
 );
 
 //
@@ -65,6 +74,13 @@ static void gxk_demo_window_init(
         GTK_WINDOW(self),
         450,
         350
+    );
+
+    gtk_drawing_area_set_draw_func(
+        GTK_DRAWING_AREA(gtk_builder_get_object(builder, "drawing")),
+        (GtkDrawingAreaDrawFunc) cb_drawing_area_draw,
+        NULL,
+        NULL
     );
 
     g_object_unref(builder);
@@ -122,4 +138,16 @@ static void action_select_stuff(
     g_object_unref(builder);
 
     gtk_widget_show(dialog);
+}
+
+static void cb_drawing_area_draw(
+    GXK_UNUSED(GtkDrawingArea* drawing_area),
+    cairo_t* cr,
+    GXK_UNUSED(gint width),
+    GXK_UNUSED(gint height),
+    GXK_UNUSED(gpointer user_data)
+)
+{
+    cairo_set_source_rgb(cr, 1.0f, 1.0f, 1.0f);
+    cairo_paint(cr);
 }
