@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 
 #include "../public/popovermenubar.h"
+#include "popovermenubaritem.h"
 
 //
 // PRIVATE ENUMS
@@ -50,7 +51,7 @@ struct _GxkPopoverMenuBar
 };
 
 //
-// GOBJECT YPE DEFINITION & CTORS
+// GOBJECT TYPE DEFINITION & CTORS
 //
 G_DEFINE_TYPE(
     GxkPopoverMenuBar,
@@ -207,9 +208,14 @@ void gxk_popover_menu_bar_bind_model(
             &text
         );
 
-        GtkWidget* label = gtk_label_new(text);
+        GtkWidget* bar_item = gxk_popover_menu_bar_item_new();
 
-        gtk_widget_set_parent(label, GTK_WIDGET(menu_bar));
+        gxk_popover_menu_bar_item_set_label(
+            GXK_POPOVER_MENU_BAR_ITEM(bar_item),
+            text
+        );
+
+        gtk_widget_set_parent(bar_item, GTK_WIDGET(menu_bar));
 
         g_free(text);
     }
