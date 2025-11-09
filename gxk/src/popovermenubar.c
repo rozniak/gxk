@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 
 #include "../public/popovermenubar.h"
+#include "popovermenubar-int.h"
 #include "popovermenubaritem.h"
 
 //
@@ -48,6 +49,8 @@ struct _GxkPopoverMenuBar
     // State
     //
     GMenuModel* model;
+
+    GxkPopoverMenuBarItem* active_item;
 };
 
 //
@@ -218,5 +221,40 @@ void gxk_popover_menu_bar_bind_model(
         gtk_widget_set_parent(bar_item, GTK_WIDGET(menu_bar));
 
         g_free(text);
+    }
+}
+
+//
+// INTERNAL FUNCTIONS
+//
+void gxk_popover_menu_bar_set_active_item(
+    GxkPopoverMenuBar*     menu_bar,
+    GxkPopoverMenuBarItem* bar_item
+)
+{
+    gboolean changed = menu_bar->active_item != bar_item;
+
+    if (!changed)
+    {
+        return;
+    }
+
+    if (menu_bar->active_item)
+    {
+        gtk_widget_unset_state_flags(
+            GTK_WIDGET(menu_bar->active_item),
+            GTK_STATE_FLAG_SELECTED
+        );
+    }
+
+    menu_bar->active_item = bar_item;
+
+    if (menu_bar->active_item)
+    {
+        gtk_widget_set_state_flags(
+            GTK_WIDGET(bar_item),
+            GTK_STATE_FLAG_SELECTED,
+            FALSE
+        );
     }
 }

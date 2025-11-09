@@ -1,6 +1,8 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#include "../public/popovermenubar.h"
+#include "popovermenubar-int.h"
 #include "popovermenubaritem.h"
 
 //
@@ -30,6 +32,13 @@ static void gxk_popover_menu_bar_item_set_property(
     guint         prop_id,
     const GValue* value,
     GParamSpec*   pspec
+);
+
+static void on_event_enter(
+    GtkEventController* controller,
+    gdouble             x,
+    gdouble             y,
+    gpointer            user_data
 );
 
 //
@@ -98,11 +107,40 @@ static void gxk_popover_menu_bar_item_init(
     GxkPopoverMenuBarItem* self
 )
 {
+    GtkEventController* controller;
+
+    gtk_widget_set_focusable(GTK_WIDGET(self), TRUE);
+
+    // FIXME: Just doing a label here, probably need to be more flexible
+    //        later...
+    //
     self->label = gtk_label_new(NULL);
 
     gtk_widget_set_parent(
         self->label,
         GTK_WIDGET(self)
+    );
+
+    // Motion event
+    //
+    controller =
+        GTK_EVENT_CONTROLLER(gtk_event_controller_motion_new());
+
+    gtk_event_controller_set_propagation_limit(
+        controller,
+        GTK_LIMIT_NONE
+    );
+
+    g_signal_connect(
+        controller,
+        "enter",
+        G_CALLBACK(on_event_enter),
+        NULL
+    );
+
+    gtk_widget_add_controller(
+        GTK_WIDGET(self),
+        controller
     );
 }
 
@@ -192,5 +230,37 @@ void gxk_popover_menu_bar_item_set_label(
     g_object_notify_by_pspec(
         G_OBJECT(bar_item),
         gxk_popover_menu_bar_item_properties[PROP_LABEL]
+    );
+}
+
+//
+// CALLBACKS
+//
+static void on_event_enter(
+    GtkEventController* controller,
+    gdouble             x,
+    gdouble             y,
+    gpointer            user_data
+)
+{
+    GxkPopoverMenuBarItem* bar_item;
+    GxkPopoverMenuBar*     menu_bar;
+
+    bar_item =
+        GXK_POPOVER_MENU_BAR_ITEM(
+            gtk_event_controller_get_widget(controller)
+        );
+
+    menu_bar =
+        GXK_POPOVER_MENU_BAR(
+            gtk_widget_get_ancestor(
+                GTK_WIDGET(bar_item),
+                GXK_TYPE_POPOVER_MENU_BAR
+            )
+        );
+
+    gxk_popover_menu_bar_set_active_item(
+        menu_bar,
+        bar_item
     );
 }
