@@ -34,6 +34,11 @@ static void gxk_popover_menu_bar_set_property(
     GParamSpec*   pspec
 );
 
+static void on_event_leave(
+    GtkEventControllerMotion* self,
+    gpointer                  user_data
+);
+
 //
 // STATIC DATA
 //
@@ -100,7 +105,29 @@ static void gxk_popover_menu_bar_class_init(
 
 static void gxk_popover_menu_bar_init(
     GxkPopoverMenuBar* self
-) {}
+)
+{
+    GtkEventController* controller;
+
+    // Motion event
+    //
+    controller =
+        GTK_EVENT_CONTROLLER(gtk_event_controller_motion_new());
+
+    gtk_event_controller_set_propagation_limit(
+        controller,
+        GTK_LIMIT_NONE
+    );
+
+    g_signal_connect(
+        controller,
+        "leave",
+        G_CALLBACK(on_event_leave),
+        NULL
+    );
+
+    gtk_widget_add_controller(GTK_WIDGET(self), controller);
+}
 
 //
 // CLASS VIRTUAL METHODS
@@ -257,4 +284,25 @@ void gxk_popover_menu_bar_set_active_item(
             FALSE
         );
     }
+}
+
+//
+// CALLBACKS
+//
+static void on_event_leave(
+    GtkEventControllerMotion* self,
+    gpointer                  user_data
+)
+{
+    GxkPopoverMenuBar* menu_bar =
+        GXK_POPOVER_MENU_BAR(
+            gtk_event_controller_get_widget(
+                GTK_EVENT_CONTROLLER(self)
+            )
+        );
+
+    gxk_popover_menu_bar_set_active_item(
+        menu_bar,
+        NULL
+    );
 }

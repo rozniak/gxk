@@ -35,10 +35,10 @@ static void gxk_popover_menu_bar_item_set_property(
 );
 
 static void on_event_enter(
-    GtkEventController* controller,
-    gdouble             x,
-    gdouble             y,
-    gpointer            user_data
+    GtkEventControllerMotion* self,
+    gdouble                   x,
+    gdouble                   y,
+    gpointer                  user_data
 );
 
 //
@@ -237,10 +237,10 @@ void gxk_popover_menu_bar_item_set_label(
 // CALLBACKS
 //
 static void on_event_enter(
-    GtkEventController* controller,
-    gdouble             x,
-    gdouble             y,
-    gpointer            user_data
+    GtkEventControllerMotion* self,
+    gdouble                   x,
+    gdouble                   y,
+    gpointer                  user_data
 )
 {
     GxkPopoverMenuBarItem* bar_item;
@@ -248,7 +248,9 @@ static void on_event_enter(
 
     bar_item =
         GXK_POPOVER_MENU_BAR_ITEM(
-            gtk_event_controller_get_widget(controller)
+            gtk_event_controller_get_widget(
+                GTK_EVENT_CONTROLLER(self)
+            )
         );
 
     menu_bar =
