@@ -1,6 +1,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#include "../public/popovermenu.h"
 #include "../public/popovermenubar.h"
 #include "popovermenubar-int.h"
 #include "popovermenubaritem.h"
@@ -40,6 +41,13 @@ static void on_event_enter(
     gdouble                   y,
     gpointer                  user_data
 );
+static void on_event_pressed(
+    GtkGestureClick* self,
+    gint             n_press,
+    gdouble          x,
+    gdouble          y,
+    gpointer         user_data
+);
 
 //
 // STATIC DATA
@@ -56,6 +64,7 @@ struct _GxkPopoverMenuBarItem
     // UI
     //
     GtkWidget* label;
+    GtkWidget* popover;
 };
 
 //
@@ -119,6 +128,41 @@ static void gxk_popover_menu_bar_item_init(
     gtk_widget_set_parent(
         self->label,
         GTK_WIDGET(self)
+    );
+
+    // FIXME: Testing popovers...
+    //
+    self->popover = gxk_popover_menu_new();
+
+    gtk_popover_set_has_arrow(
+        GTK_POPOVER(self->popover),
+        FALSE
+    );
+    gtk_popover_set_position(
+        GTK_POPOVER(self->popover),
+        GTK_POS_BOTTOM
+    );
+
+    gtk_widget_set_parent(
+        self->popover,
+        GTK_WIDGET(self)
+    );
+
+    // Clicked event
+    //
+    controller =
+        GTK_EVENT_CONTROLLER(gtk_gesture_click_new());
+
+    g_signal_connect(
+        controller,
+        "pressed",
+        G_CALLBACK(on_event_pressed),
+        NULL
+    );
+
+    gtk_widget_add_controller(
+        GTK_WIDGET(self),
+        controller
     );
 
     // Motion event
@@ -264,5 +308,27 @@ static void on_event_enter(
     gxk_popover_menu_bar_set_active_item(
         menu_bar,
         bar_item
+    );
+}
+
+static void on_event_pressed(
+    GtkGestureClick* self,
+    gint             n_press,
+    gdouble          x,
+    gdouble          y,
+    gpointer         user_data
+)
+{
+    GxkPopoverMenuBarItem* bar_item;
+
+    bar_item =
+        GXK_POPOVER_MENU_BAR_ITEM(
+            gtk_event_controller_get_widget(
+                GTK_EVENT_CONTROLLER(self)
+            )
+        );
+
+    gtk_popover_popup(
+        GTK_POPOVER(bar_item->popover)
     );
 }
