@@ -264,6 +264,13 @@ GtkWidget* gxk_popover_menu_bar_item_new(void)
     );
 }
 
+GtkWidget* gxk_popover_menu_bar_item_get_popover(
+    GxkPopoverMenuBarItem* bar_item
+)
+{
+    return bar_item->popover;
+}
+
 gboolean gxk_popover_menu_bar_item_get_popover_popped(
     GxkPopoverMenuBarItem* bar_item
 )

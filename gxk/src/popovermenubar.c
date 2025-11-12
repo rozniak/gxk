@@ -38,6 +38,10 @@ static void on_event_leave(
     GtkEventControllerMotion* self,
     gpointer                  user_data
 );
+static void on_popover_unmap(
+    GtkWidget* self,
+    gpointer   user_data
+);
 
 //
 // STATIC DATA
@@ -245,6 +249,20 @@ void gxk_popover_menu_bar_bind_model(
             text
         );
 
+        // FIXME: Temp
+        //
+        GtkWidget* popover =
+            gxk_popover_menu_bar_item_get_popover(
+                GXK_POPOVER_MENU_BAR_ITEM(bar_item)
+            );
+
+        g_signal_connect(
+            popover,
+            "unmap",
+            G_CALLBACK(on_popover_unmap),
+            menu_bar
+        );
+
         gtk_widget_set_parent(bar_item, GTK_WIDGET(menu_bar));
 
         g_free(text);
@@ -342,6 +360,26 @@ static void on_event_leave(
         !gxk_popover_menu_bar_item_get_popover_popped(
             menu_bar->active_item
         )
+    )
+    {
+        gxk_popover_menu_bar_set_active_item(
+            menu_bar,
+            NULL,
+            FALSE
+        );
+    }
+}
+
+static void on_popover_unmap(
+    GtkWidget* self,
+    gpointer   user_data
+)
+{
+    GxkPopoverMenuBar* menu_bar = GXK_POPOVER_MENU_BAR(user_data);
+
+    if (
+        menu_bar->active_item &&
+        gxk_popover_menu_bar_item_get_popover(menu_bar->active_item) == self
     )
     {
         gxk_popover_menu_bar_set_active_item(
