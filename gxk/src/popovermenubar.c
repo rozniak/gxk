@@ -256,33 +256,69 @@ void gxk_popover_menu_bar_bind_model(
 //
 void gxk_popover_menu_bar_set_active_item(
     GxkPopoverMenuBar*     menu_bar,
-    GxkPopoverMenuBarItem* bar_item
+    GxkPopoverMenuBarItem* bar_item,
+    gboolean               popup
 )
 {
-    gboolean changed = menu_bar->active_item != bar_item;
+    gboolean changed      = menu_bar->active_item != bar_item;
+    gboolean popup_active = FALSE;
 
-    if (!changed)
-    {
-        return;
-    }
+    g_message("%s", "Enter");
 
     if (menu_bar->active_item)
     {
-        gtk_widget_unset_state_flags(
-            GTK_WIDGET(menu_bar->active_item),
-            GTK_STATE_FLAG_SELECTED
-        );
+        popup_active =
+            gxk_popover_menu_bar_item_get_popover_popped(
+                menu_bar->active_item
+            );
     }
 
-    menu_bar->active_item = bar_item;
-
-    if (menu_bar->active_item)
+    if (changed && popup_active)
     {
-        gtk_widget_set_state_flags(
-            GTK_WIDGET(bar_item),
-            GTK_STATE_FLAG_SELECTED,
+        gxk_popover_menu_bar_item_set_popover_popped(
+            menu_bar->active_item,
             FALSE
         );
+    }
+
+    if (changed)
+    {
+        if (menu_bar->active_item)
+        {
+            gtk_widget_unset_state_flags(
+                GTK_WIDGET(menu_bar->active_item),
+                GTK_STATE_FLAG_SELECTED
+            );
+        }
+
+        menu_bar->active_item = bar_item;
+
+        if (menu_bar->active_item)
+        {
+            gtk_widget_set_state_flags(
+                GTK_WIDGET(bar_item),
+                GTK_STATE_FLAG_SELECTED,
+                FALSE
+            );
+        }
+    }
+
+    if (menu_bar->active_item)
+    {
+        GtkStateFlags state =
+            gtk_widget_get_state_flags(GTK_WIDGET(menu_bar));
+
+        if (popup || (changed && popup_active))
+        {
+            gxk_popover_menu_bar_item_set_popover_popped(
+                menu_bar->active_item,
+                TRUE
+            );
+        }
+        else if (changed && (state & GTK_STATE_FLAG_FOCUS_WITHIN))
+        {
+            gtk_widget_grab_focus(GTK_WIDGET(menu_bar->active_item));
+        }
     }
 }
 
@@ -301,8 +337,17 @@ static void on_event_leave(
             )
         );
 
-    gxk_popover_menu_bar_set_active_item(
-        menu_bar,
-        NULL
-    );
+    if (
+        menu_bar->active_item &&
+        !gxk_popover_menu_bar_item_get_popover_popped(
+            menu_bar->active_item
+        )
+    )
+    {
+        gxk_popover_menu_bar_set_active_item(
+            menu_bar,
+            NULL,
+            FALSE
+        );
+    }
 }

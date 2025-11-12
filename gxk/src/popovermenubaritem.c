@@ -264,6 +264,13 @@ GtkWidget* gxk_popover_menu_bar_item_new(void)
     );
 }
 
+gboolean gxk_popover_menu_bar_item_get_popover_popped(
+    GxkPopoverMenuBarItem* bar_item
+)
+{
+    return gtk_widget_get_mapped(bar_item->popover);
+}
+
 void gxk_popover_menu_bar_item_set_label(
     GxkPopoverMenuBarItem* bar_item,
     const gchar*           label
@@ -275,6 +282,27 @@ void gxk_popover_menu_bar_item_set_label(
         G_OBJECT(bar_item),
         gxk_popover_menu_bar_item_properties[PROP_LABEL]
     );
+}
+
+void gxk_popover_menu_bar_item_set_popover_popped(
+    GxkPopoverMenuBarItem* bar_item,
+    gboolean               pop
+)
+{
+    if (pop)
+    {
+        g_message("%s", "popup!");
+        gtk_popover_popup(
+            GTK_POPOVER(bar_item->popover)
+        );
+    }
+    else
+    {
+        g_message("%s", "popdown");
+        gtk_popover_popdown(
+            GTK_POPOVER(bar_item->popover)
+        );
+    }
 }
 
 //
@@ -307,7 +335,8 @@ static void on_event_enter(
 
     gxk_popover_menu_bar_set_active_item(
         menu_bar,
-        bar_item
+        bar_item,
+        FALSE
     );
 }
 
@@ -320,6 +349,7 @@ static void on_event_pressed(
 )
 {
     GxkPopoverMenuBarItem* bar_item;
+    GxkPopoverMenuBar*     menu_bar;
 
     bar_item =
         GXK_POPOVER_MENU_BAR_ITEM(
@@ -328,7 +358,17 @@ static void on_event_pressed(
             )
         );
 
-    gtk_popover_popup(
-        GTK_POPOVER(bar_item->popover)
+    menu_bar =
+        GXK_POPOVER_MENU_BAR(
+            gtk_widget_get_ancestor(
+                GTK_WIDGET(bar_item),
+                GXK_TYPE_POPOVER_MENU_BAR
+            )
+        );
+
+    gxk_popover_menu_bar_set_active_item(
+        menu_bar,
+        bar_item,
+        TRUE
     );
 }

@@ -9,7 +9,8 @@
 //
 void gxk_popover_menu_bar_set_active_item(
     GxkPopoverMenuBar*     menu_bar,
-    GxkPopoverMenuBarItem* bar_item
+    GxkPopoverMenuBarItem* bar_item,
+    gboolean               popup
 );
 
 #endif

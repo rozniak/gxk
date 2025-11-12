@@ -22,9 +22,16 @@ G_DECLARE_FINAL_TYPE(
 //
 GtkWidget* gxk_popover_menu_bar_item_new(void);
 
+gboolean gxk_popover_menu_bar_item_get_popover_popped(
+    GxkPopoverMenuBarItem* bar_item
+);
 void gxk_popover_menu_bar_item_set_label(
     GxkPopoverMenuBarItem* bar_item,
     const gchar*           label
+);
+void gxk_popover_menu_bar_item_set_popover_popped(
+    GxkPopoverMenuBarItem* bar_item,
+    gboolean               pop
 );
 
 #endif
