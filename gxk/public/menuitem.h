@@ -26,5 +26,9 @@ void gxk_menu_item_set_child(
     GxkMenuItem* menu_item,
     GtkWidget*   child
 );
+void gxk_menu_item_set_submenu(
+    GxkMenuItem* menu_item,
+    GtkWidget*   submenu
+);
 
 #endif

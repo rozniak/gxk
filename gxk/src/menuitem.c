@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 
 #include "../public/menuitem.h"
+#include "../public/popovermenu.h"
 
 //
 // FORWARD DECLARATIONS
@@ -27,6 +28,7 @@ struct _GxkMenuItem
     // UI
     //
     GtkWidget* label;
+    GtkWidget* popover;
 };
 
 //
@@ -136,6 +138,34 @@ void gxk_menu_item_set_child(
         child,
         GTK_WIDGET(menu_item)
     );
+}
+
+void gxk_menu_item_set_submenu(
+    GxkMenuItem* menu_item,
+    GtkWidget*   submenu
+)
+{
+    // FIXME: Handle existing menu
+    //
+    if (menu_item->popover)
+    {
+        g_critical("%s", "gxk: menu item already has a submenu");
+        return;
+    }
+
+    if (GTK_IS_POPOVER(submenu))
+    {
+        menu_item->popover = submenu;
+    }
+    else
+    {
+        menu_item->popover = gxk_popover_menu_new();
+
+        gxk_popover_menu_append_child(
+            GXK_POPOVER_MENU(menu_item->popover),
+            submenu
+        );
+    }
 }
 
 //
