@@ -22,4 +22,9 @@ G_DECLARE_FINAL_TYPE(
 //
 GtkWidget* gxk_popover_menu_new(void);
 
+void gxk_popover_menu_append_child(
+    GxkPopoverMenu* menu,
+    GtkWidget*      child
+);
+
 #endif

@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 
 #include "../public/popovermenu.h"
+#include "../public/menuitem.h"
 
 //
 // FORWARD DECLARATIONS
@@ -19,7 +20,7 @@ struct _GxkPopoverMenu
 
     // UI
     //
-    GtkWidget* label;
+    GtkWidget* box_menuitems;
 };
 
 //
@@ -44,11 +45,12 @@ static void gxk_popover_menu_init(
     GxkPopoverMenu* self
 )
 {
-    self->label = gtk_label_new("Hello world!");
+    self->box_menuitems =
+        gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     gtk_popover_set_child(
         GTK_POPOVER(self),
-        self->label
+        self->box_menuitems
     );
 }
 
@@ -59,9 +61,12 @@ static void gxk_popover_menu_dispose(
     GObject* object
 )
 {
-    GxkPopoverMenu* popover = GXK_POPOVER_MENU(object);
+//    GtkWidget* child;
 
-    gtk_widget_unparent(popover->label);
+//    while ((child = gtk_widget_get_first_child(GTK_WIDGET(object))))
+//    {
+//        gtk_widget_unparent(child);
+//    }
 
     (G_OBJECT_CLASS(gxk_popover_menu_parent_class))
         ->dispose(object);
@@ -77,5 +82,32 @@ GtkWidget* gxk_popover_menu_new(void)
             GXK_TYPE_POPOVER_MENU,
             NULL
         )
+    );
+}
+
+void gxk_popover_menu_append_child(
+    GxkPopoverMenu* menu,
+    GtkWidget*      child
+)
+{
+    GtkWidget* menu_item;
+
+    if (GXK_IS_MENU_ITEM(child))
+    {
+        menu_item = child;
+    }
+    else
+    {
+        menu_item = gxk_menu_item_new();
+
+        gxk_menu_item_set_child(
+            GXK_MENU_ITEM(menu_item),
+            child
+        );
+    }
+
+    gtk_box_append(
+        GTK_BOX(menu->box_menuitems),
+        menu_item
     );
 }

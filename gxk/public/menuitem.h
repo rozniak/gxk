@@ -1,0 +1,30 @@
+#ifndef __GXK_MENU_ITEM_H__
+#define __GXK_MENU_ITEM_H__
+
+#include <glib.h>
+#include <gtk/gtk.h>
+
+//
+// GOBJECT BOILERPLATE
+//
+#define GXK_TYPE_MENU_ITEM (gxk_menu_item_get_type())
+
+G_DECLARE_FINAL_TYPE(
+    GxkMenuItem,
+    gxk_menu_item,
+    GXK,
+    MENU_ITEM,
+    GtkWidget
+)
+
+//
+// PUBLIC FUNCTIONS
+//
+GtkWidget* gxk_menu_item_new(void);
+
+void gxk_menu_item_set_child(
+    GxkMenuItem* menu_item,
+    GtkWidget*   child
+);
+
+#endif
