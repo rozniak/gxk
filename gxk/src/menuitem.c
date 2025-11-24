@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 
 #include "../public/menuitem.h"
+#include "../public/menushell.h"
 #include "../public/popovermenu.h"
 
 //
@@ -51,7 +52,7 @@ static void gxk_menu_item_class_init(
 
     gtk_widget_class_set_css_name(
         widget_class,
-        "menuitem"
+        "item"
     );
     gtk_widget_class_set_layout_manager_type(
         widget_class,
@@ -121,6 +122,25 @@ GtkWidget* gxk_menu_item_new(void)
     );
 }
 
+GtkWidget* gxk_menu_item_from_widget(
+    GtkWidget* child
+)
+{
+    if (GXK_IS_MENU_ITEM(child))
+    {
+        return child;
+    }
+
+    GtkWidget* menu_item = gxk_menu_item_new();
+
+    gxk_menu_item_set_child(
+        GXK_MENU_ITEM(menu_item),
+        child
+    );
+
+    return menu_item;
+}
+
 void gxk_menu_item_set_child(
     GxkMenuItem* menu_item,
     GtkWidget*   child
@@ -161,8 +181,8 @@ void gxk_menu_item_set_submenu(
     {
         menu_item->popover = gxk_popover_menu_new();
 
-        gxk_popover_menu_append_child(
-            GXK_POPOVER_MENU(menu_item->popover),
+        gxk_menu_shell_append(
+            GXK_MENU_SHELL(menu_item->popover),
             submenu
         );
     }

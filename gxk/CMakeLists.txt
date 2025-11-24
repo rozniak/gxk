@@ -22,6 +22,8 @@ add_library(
     public/init.h
     src/menuitem.c
     public/menuitem.h
+    src/menushell.c
+    public/menushell.h
     src/popovermenu.c
     public/popovermenu.h
     src/popovermenubar.c

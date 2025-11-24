@@ -21,6 +21,9 @@ G_DECLARE_FINAL_TYPE(
 // PUBLIC FUNCTIONS
 //
 GtkWidget* gxk_menu_item_new(void);
+GtkWidget* gxk_menu_item_from_widget(
+    GtkWidget* child
+);
 
 void gxk_menu_item_set_child(
     GxkMenuItem* menu_item,
