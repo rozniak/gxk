@@ -1,6 +1,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#include "../public/menubinding.h"
 #include "../public/menuitem.h"
 #include "../public/menushell.h"
 #include "../public/popovermenu.h"
@@ -78,7 +79,8 @@ struct _GxkPopoverMenuBar
 
     // State
     //
-    GMenuModel* model;
+    GxkMenuBinding* binding;
+    GMenuModel*     model;
 
     GxkPopoverMenuBarItem* active_item;
 };
@@ -174,12 +176,21 @@ static void gxk_popover_menu_bar_dispose(
     GObject* object
 )
 {
+    GxkPopoverMenuBar* menu_bar = GXK_POPOVER_MENU_BAR(object);
+
+    // Bin off child widgets
+    //
     GtkWidget* child;
 
     while ((child = gtk_widget_get_first_child(GTK_WIDGET(object))))
     {
         gtk_widget_unparent(child);
     }
+
+    // Clean up our state
+    //
+    g_clear_object(&(menu_bar->binding));
+    g_clear_object(&(menu_bar->model));
 
     (G_OBJECT_CLASS(gxk_popover_menu_bar_parent_class))
         ->dispose(object);
@@ -310,7 +321,7 @@ void gxk_popover_menu_bar_bind_model(
 )
 {
     // FIXME: Clear out old menu model first
-    if (menu_bar->model)
+    if (menu_bar->binding || menu_bar->model)
     {
         g_critical("%s", "gxk: menubar: need to clear out existing model!!");
         return;
@@ -320,56 +331,11 @@ void gxk_popover_menu_bar_bind_model(
     //
     menu_bar->model = g_object_ref(menu_model);
 
-    gint n_items = g_menu_model_get_n_items(menu_model);
-
-    for (gint i = 0; i < n_items; i++)
-    {
-        gchar* text = NULL;
-
-        g_menu_model_get_item_attribute(
-            menu_model,
-            i,
-            G_MENU_ATTRIBUTE_LABEL,
-            "s",
-            &text
-        );
-
-        GtkWidget* label     = gtk_label_new(text);
-        GtkWidget* menu_item = gxk_menu_item_new();
-
-        gxk_menu_item_set_child(
-            GXK_MENU_ITEM(menu_item),
-            label
-        );
-
-        gxk_menu_shell_append(
+    menu_bar->binding =
+        gxk_menu_binding_new(
             GXK_MENU_SHELL(menu_bar),
-            menu_item
+            menu_model
         );
-
-        g_free(text);
-
-        // FIXME: Temp
-        //
-        GtkWidget* popover = gxk_popover_menu_new();
-
-        gxk_menu_shell_append(
-            GXK_MENU_SHELL(popover),
-            gtk_label_new("Rory Test")
-        );
-
-        g_signal_connect(
-            popover,
-            "unmap",
-            G_CALLBACK(on_popover_unmap),
-            menu_bar
-        );
-
-        gxk_menu_item_set_submenu(
-            GXK_MENU_ITEM(menu_item),
-            popover
-        );
-    }
 }
 
 //

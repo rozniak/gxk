@@ -925,7 +925,7 @@ static void gxk_menu_binding_remove_item(
 
     g_critical(
         "%s",
-        "comctl - menu binding - somehow failed to find menu item to delete?"
+        "gxk - menu binding - somehow failed to find menu item to delete?"
     );
 }
 
@@ -946,7 +946,7 @@ static void gxk_menu_binding_track_menu(
     tracker->sections     = NULL;
 
     g_message(
-        "comctl - menu binding - new menu tracker: %p",
+        "gxk - menu binding - new menu tracker: %p",
         (void*) tracker
     );
 
@@ -1001,7 +1001,7 @@ static void on_menu_model_menu_items_changed(
     GxkMenuBindingMenu* menu = (GxkMenuBindingMenu*) user_data;
 
     g_message(
-        "comctl - menubind - update pos %d, remove %d, add %d",
+        "gxk - menubinding - update pos %d, remove %d, add %d",
         position,
         removed,
         added
