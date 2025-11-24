@@ -20,6 +20,8 @@ add_library(
     public/application.h
     src/init.c
     public/init.h
+    src/menubinding.c
+    public/menubinding.h
     src/menuitem.c
     public/menuitem.h
     src/menushell.c
