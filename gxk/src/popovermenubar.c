@@ -6,8 +6,6 @@
 #include "../public/menushell.h"
 #include "../public/popovermenu.h"
 #include "../public/popovermenubar.h"
-#include "popovermenubar-int.h"
-#include "popovermenubaritem.h"
 
 //
 // PRIVATE ENUMS
@@ -56,6 +54,12 @@ static void gxk_popover_menu_bar_insert(
     gint          position
 );
 
+static void gxk_popover_menu_bar_set_active_item(
+    GxkMenuShell* menu_shell,
+    GxkMenuItem*  menu_item,
+    gboolean      popup
+);
+
 static void on_event_leave(
     GtkEventControllerMotion* self,
     gpointer                  user_data
@@ -82,7 +86,7 @@ struct _GxkPopoverMenuBar
     GxkMenuBinding* binding;
     GMenuModel*     model;
 
-    GxkPopoverMenuBarItem* active_item;
+    GxkMenuItem* active_item;
 };
 
 //
@@ -167,6 +171,8 @@ static void gxk_popover_menu_bar_menu_shell_interface_init(
     iface->append  = gxk_popover_menu_bar_append;
     iface->prepend = gxk_popover_menu_bar_prepend;
     iface->insert  = gxk_popover_menu_bar_insert;
+
+    iface->set_active_item = gxk_popover_menu_bar_set_active_item;
 }
 
 //
@@ -341,13 +347,15 @@ void gxk_popover_menu_bar_bind_model(
 //
 // INTERNAL FUNCTIONS
 //
-void gxk_popover_menu_bar_set_active_item(
-    GxkPopoverMenuBar*     menu_bar,
-    GxkPopoverMenuBarItem* bar_item,
-    gboolean               popup
+static void gxk_popover_menu_bar_set_active_item(
+    GxkMenuShell* menu_shell,
+    GxkMenuItem*  menu_item,
+    gboolean      popup
 )
 {
-    gboolean changed      = menu_bar->active_item != bar_item;
+    GxkPopoverMenuBar* menu_bar = GXK_POPOVER_MENU_BAR(menu_shell);
+
+    gboolean changed      = menu_bar->active_item != menu_item;
     gboolean popup_active = FALSE;
 
     g_message("%s", "Enter");
@@ -355,14 +363,14 @@ void gxk_popover_menu_bar_set_active_item(
     if (menu_bar->active_item)
     {
         popup_active =
-            gxk_popover_menu_bar_item_get_popover_popped(
+            gxk_menu_item_get_submenu_popped(
                 menu_bar->active_item
             );
     }
 
     if (changed && popup_active)
     {
-        gxk_popover_menu_bar_item_set_popover_popped(
+        gxk_menu_item_set_submenu_popped(
             menu_bar->active_item,
             FALSE
         );
@@ -378,12 +386,12 @@ void gxk_popover_menu_bar_set_active_item(
             );
         }
 
-        menu_bar->active_item = bar_item;
+        menu_bar->active_item = menu_item;
 
         if (menu_bar->active_item)
         {
             gtk_widget_set_state_flags(
-                GTK_WIDGET(bar_item),
+                GTK_WIDGET(menu_item),
                 GTK_STATE_FLAG_SELECTED,
                 FALSE
             );
@@ -397,7 +405,7 @@ void gxk_popover_menu_bar_set_active_item(
 
         if (popup || (changed && popup_active))
         {
-            gxk_popover_menu_bar_item_set_popover_popped(
+            gxk_menu_item_set_submenu_popped(
                 menu_bar->active_item,
                 TRUE
             );
@@ -426,19 +434,20 @@ static void on_event_leave(
 
     if (
         menu_bar->active_item &&
-        !gxk_popover_menu_bar_item_get_popover_popped(
+        !gxk_menu_item_get_submenu_popped(
             menu_bar->active_item
         )
     )
     {
         gxk_popover_menu_bar_set_active_item(
-            menu_bar,
+            GXK_MENU_SHELL(menu_bar),
             NULL,
             FALSE
         );
     }
 }
 
+/*
 static void on_popover_unmap(
     GtkWidget* self,
     gpointer   user_data
@@ -458,3 +467,4 @@ static void on_popover_unmap(
         );
     }
 }
+*/

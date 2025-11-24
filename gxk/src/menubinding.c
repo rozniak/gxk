@@ -520,7 +520,7 @@ static void gxk_menu_binding_insert_item(
             g_object_unref(icon);
         }
 
-        gtk_box_prepend(
+        gtk_box_append(
             GTK_BOX(box_container),
             img_icon
         );
@@ -547,7 +547,7 @@ static void gxk_menu_binding_insert_item(
 
         gtk_label_set_xalign(GTK_LABEL(label_title), 0.0f);
 
-        gtk_box_prepend(
+        gtk_box_append(
             GTK_BOX(box_container),
             label_title
         );

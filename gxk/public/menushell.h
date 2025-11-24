@@ -4,6 +4,8 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#include "menuitem.h"
+
 //
 // GOBJECT INTERFACE DEFINITIONS
 //
@@ -34,6 +36,12 @@ struct _GxkMenuShellInterface
         GtkWidget*    child,
         gint          position
     );
+
+    void (*set_active_item) (
+        GxkMenuShell* menu_shell,
+        GxkMenuItem*  menu_item,
+        gboolean      popup
+    );
 };
 
 //
@@ -51,6 +59,12 @@ void gxk_menu_shell_insert(
     GxkMenuShell* menu_shell,
     GtkWidget*    child,
     gint          position
+);
+
+void gxk_menu_shell_set_active_item(
+    GxkMenuShell* menu_shell,
+    GxkMenuItem*  menu_item,
+    gboolean      popup
 );
 
 #endif

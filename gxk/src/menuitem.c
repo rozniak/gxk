@@ -18,6 +18,13 @@ static void on_event_enter(
     gdouble                   y,
     gpointer                  user_data
 );
+static void on_event_pressed(
+    GtkGestureClick* self,
+    gint             n_press,
+    gdouble          x,
+    gdouble          y,
+    gpointer         user_data
+);
 
 //
 // GOBJECT CLASS/INSTANCE DEFINITIONS
@@ -28,7 +35,6 @@ struct _GxkMenuItem
 
     // UI
     //
-    GtkWidget* label;
     GtkWidget* popover;
 };
 
@@ -67,6 +73,23 @@ static void gxk_menu_item_init(
     GtkEventController* controller;
 
     gtk_widget_set_focusable(GTK_WIDGET(self), TRUE);
+
+    // Clicked event
+    //
+    controller =
+        GTK_EVENT_CONTROLLER(gtk_gesture_click_new());
+
+    g_signal_connect(
+        controller,
+        "pressed",
+        G_CALLBACK(on_event_pressed),
+        NULL
+    );
+
+    gtk_widget_add_controller(
+        GTK_WIDGET(self),
+        controller
+    );
 
     // Motion event
     //
@@ -141,6 +164,13 @@ GtkWidget* gxk_menu_item_from_widget(
     return menu_item;
 }
 
+gboolean gxk_menu_item_get_submenu_popped(
+    GxkMenuItem* menu_item
+)
+{
+    return gtk_widget_get_mapped(menu_item->popover);
+}
+
 void gxk_menu_item_set_child(
     GxkMenuItem* menu_item,
     GtkWidget*   child
@@ -186,6 +216,35 @@ void gxk_menu_item_set_submenu(
             submenu
         );
     }
+
+    gtk_widget_set_parent(
+        menu_item->popover,
+        GTK_WIDGET(menu_item)
+    );
+}
+
+void gxk_menu_item_set_submenu_popped(
+    GxkMenuItem* menu_item,
+    gboolean     popped
+)
+{
+    if (!menu_item->popover)
+    {
+        return;
+    }
+
+    if (popped)
+    {
+        gtk_popover_popup(
+            GTK_POPOVER(menu_item->popover)
+        );
+    }
+    else
+    {
+        gtk_popover_popdown(
+            GTK_POPOVER(menu_item->popover)
+        );
+    }
 }
 
 //
@@ -198,5 +257,52 @@ static void on_event_enter(
     gpointer                  user_data
 )
 {
-    g_message("%s", "This is a test!");
+    GtkEventController* controller = GTK_EVENT_CONTROLLER(self);
+
+    GxkMenuItem* menu_item =
+        GXK_MENU_ITEM(
+            gtk_event_controller_get_widget(controller)
+        );
+    GxkMenuShell* menu_shell =
+        GXK_MENU_SHELL(
+            gtk_widget_get_ancestor(
+                GTK_WIDGET(menu_item),
+                GXK_TYPE_MENU_SHELL
+            )
+        );
+
+    gxk_menu_shell_set_active_item(
+        menu_shell,
+        menu_item,
+        FALSE
+    );
+}
+
+static void on_event_pressed(
+    GtkGestureClick* self,
+    gint             n_press,
+    gdouble          x,
+    gdouble          y,
+    gpointer         user_data
+)
+{
+    GtkEventController* controller = GTK_EVENT_CONTROLLER(self);
+
+    GxkMenuItem* menu_item =
+        GXK_MENU_ITEM(
+            gtk_event_controller_get_widget(controller)
+        );
+    GxkMenuShell* menu_shell =
+        GXK_MENU_SHELL(
+            gtk_widget_get_ancestor(
+                GTK_WIDGET(menu_item),
+                GXK_TYPE_MENU_SHELL
+            )
+        );
+
+    gxk_menu_shell_set_active_item(
+        menu_shell,
+        menu_item,
+        TRUE
+    );
 }

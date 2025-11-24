@@ -52,3 +52,19 @@ void gxk_menu_shell_insert(
 
     iface->insert(menu_shell, child, position);
 }
+
+void gxk_menu_shell_set_active_item(
+    GxkMenuShell* menu_shell,
+    GxkMenuItem*  menu_item,
+    gboolean      popup
+)
+{
+    GxkMenuShellInterface* iface =
+        GXK_MENU_SHELL_GET_IFACE(menu_shell);
+
+    iface->set_active_item(
+        menu_shell,
+        menu_item,
+        popup
+    );
+}

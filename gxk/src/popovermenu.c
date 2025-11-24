@@ -75,6 +75,15 @@ static void gxk_popover_menu_init(
         GTK_POPOVER(self),
         self->box_menuitems
     );
+
+    gtk_popover_set_has_arrow(
+        GTK_POPOVER(self),
+        FALSE
+    );
+    gtk_popover_set_position(
+        GTK_POPOVER(self),
+        GTK_POS_BOTTOM
+    );
 }
 
 static void gxk_popover_menu_menu_shell_interface_init(

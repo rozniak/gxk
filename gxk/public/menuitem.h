@@ -25,6 +25,10 @@ GtkWidget* gxk_menu_item_from_widget(
     GtkWidget* child
 );
 
+gboolean gxk_menu_item_get_submenu_popped(
+    GxkMenuItem* menu_item
+);
+
 void gxk_menu_item_set_child(
     GxkMenuItem* menu_item,
     GtkWidget*   child
@@ -32,6 +36,10 @@ void gxk_menu_item_set_child(
 void gxk_menu_item_set_submenu(
     GxkMenuItem* menu_item,
     GtkWidget*   submenu
+);
+void gxk_menu_item_set_submenu_popped(
+    GxkMenuItem* menu_item,
+    gboolean     popped
 );
 
 #endif
