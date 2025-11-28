@@ -30,9 +30,6 @@ add_library(
     public/popovermenu.h
     src/popovermenubar.c
     public/popovermenubar.h
-    src/popovermenubar-int.h
-    src/popovermenubaritem.c
-    src/popovermenubaritem.h
 )
 
 target_include_directories(

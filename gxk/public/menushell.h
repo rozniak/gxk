@@ -7,6 +7,15 @@
 #include "menuitem.h"
 
 //
+// PUBLIC ENUMS
+//
+typedef enum _GxkMenuShellKind
+{
+    GXK_MENU_SHELL_MENU_BAR,
+    GXK_MENU_SHELL_MENU
+} GxkMenuShellKind;
+
+//
 // GOBJECT INTERFACE DEFINITIONS
 //
 #define GXK_TYPE_MENU_SHELL (gxk_menu_shell_get_type())
@@ -27,6 +36,9 @@ struct _GxkMenuShellInterface
         GxkMenuShell* menu_shell,
         GtkWidget*    child
     );
+    GxkMenuShellKind (*get_kind) (
+        GxkMenuShell* menu_shell
+    );
     void (*prepend) (
         GxkMenuShell* menu_shell,
         GtkWidget*    child
@@ -36,7 +48,6 @@ struct _GxkMenuShellInterface
         GtkWidget*    child,
         gint          position
     );
-
     void (*set_active_item) (
         GxkMenuShell* menu_shell,
         GxkMenuItem*  menu_item,
@@ -51,6 +62,9 @@ void gxk_menu_shell_append(
     GxkMenuShell* menu_shell,
     GtkWidget*    child
 );
+GxkMenuShellKind gxk_menu_shell_get_kind(
+    GxkMenuShell* menu_shell
+);
 void gxk_menu_shell_prepend(
     GxkMenuShell* menu_shell,
     GtkWidget*    child
@@ -60,7 +74,6 @@ void gxk_menu_shell_insert(
     GtkWidget*    child,
     gint          position
 );
-
 void gxk_menu_shell_set_active_item(
     GxkMenuShell* menu_shell,
     GxkMenuItem*  menu_item,

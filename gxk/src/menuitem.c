@@ -12,11 +12,14 @@ static void gxk_menu_item_dispose(
     GObject* object
 );
 
-static void on_event_enter(
-    GtkEventControllerMotion* self,
-    gdouble                   x,
-    gdouble                   y,
-    gpointer                  user_data
+static void gxk_menu_item_open_submenu(
+    GxkMenuItem* menu_item
+);
+
+static void on_event_contains_pointer(
+    GObject*    self,
+    GParamSpec* pspec,
+    gpointer    user_data
 );
 static void on_event_pressed(
     GtkGestureClick* self,
@@ -103,8 +106,8 @@ static void gxk_menu_item_init(
 
     g_signal_connect(
         controller,
-        "enter",
-        G_CALLBACK(on_event_enter),
+        "notify::contains-pointer",
+        G_CALLBACK(on_event_contains_pointer),
         NULL
     );
 
@@ -205,6 +208,15 @@ void gxk_menu_item_set_submenu(
 
     if (GTK_IS_POPOVER(submenu))
     {
+        if (!GXK_IS_MENU_SHELL(submenu))
+        {
+            g_critical(
+                "%s",
+                "gxk: menu item submenu is a popover but not a menu shell"
+            );
+            return;
+        }
+
         menu_item->popover = submenu;
     }
     else
@@ -250,18 +262,20 @@ void gxk_menu_item_set_submenu_popped(
 //
 // CALLBACKS
 //
-static void on_event_enter(
-    GtkEventControllerMotion* self,
-    gdouble                   x,
-    gdouble                   y,
-    gpointer                  user_data
+static void on_event_contains_pointer(
+    GObject*    self,
+    GParamSpec* pspec,
+    gpointer    user_data
 )
 {
-    GtkEventController* controller = GTK_EVENT_CONTROLLER(self);
+    GtkEventControllerMotion* controller =
+        GTK_EVENT_CONTROLLER_MOTION(self);
 
     GxkMenuItem* menu_item =
         GXK_MENU_ITEM(
-            gtk_event_controller_get_widget(controller)
+            gtk_event_controller_get_widget(
+                GTK_EVENT_CONTROLLER(controller)
+            )
         );
     GxkMenuShell* menu_shell =
         GXK_MENU_SHELL(
@@ -271,11 +285,30 @@ static void on_event_enter(
             )
         );
 
-    gxk_menu_shell_set_active_item(
-        menu_shell,
-        menu_item,
-        FALSE
-    );
+    if (gtk_event_controller_motion_contains_pointer(controller))
+    {
+        gxk_menu_shell_set_active_item(
+            menu_shell,
+            menu_item,
+            FALSE
+        );
+
+        if (gxk_menu_shell_get_kind(menu_shell) == GXK_MENU_SHELL_MENU)
+        {
+            gxk_menu_item_set_submenu_popped(menu_item, TRUE);
+        }
+    }
+    else
+    {
+        if (menu_item->popover)
+        {
+            gxk_menu_shell_set_active_item(
+                GXK_MENU_SHELL(menu_item->popover),
+                NULL,
+                FALSE
+            );
+        }
+    }
 }
 
 static void on_event_pressed(

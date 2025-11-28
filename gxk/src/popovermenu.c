@@ -20,6 +20,9 @@ static void gxk_popover_menu_append(
     GxkMenuShell* menu_shell,
     GtkWidget*    child
 );
+static GxkMenuShellKind gxk_popover_menu_get_kind(
+    GxkMenuShell* menu_shell
+);
 static void gxk_popover_menu_prepend(
     GxkMenuShell* menu_shell,
     GtkWidget*    child
@@ -28,6 +31,11 @@ static void gxk_popover_menu_insert(
     GxkMenuShell* menu_shell,
     GtkWidget*    child,
     gint          position
+);
+static void gxk_popover_menu_set_active_item(
+    GxkMenuShell* menu_shell,
+    GxkMenuItem*  menu_item,
+    gboolean      popup
 );
 
 //
@@ -39,7 +47,8 @@ struct _GxkPopoverMenu
 
     // UI
     //
-    GtkWidget* box_menuitems;
+    GxkMenuItem* active_item;
+    GtkWidget*   box_menuitems;
 };
 
 //
@@ -90,9 +99,11 @@ static void gxk_popover_menu_menu_shell_interface_init(
     GxkMenuShellInterface* iface
 )
 {
-    iface->append  = gxk_popover_menu_append;
-    iface->prepend = gxk_popover_menu_prepend;
-    iface->insert  = gxk_popover_menu_insert;
+    iface->append          = gxk_popover_menu_append;
+    iface->get_kind        = gxk_popover_menu_get_kind;
+    iface->prepend         = gxk_popover_menu_prepend;
+    iface->insert          = gxk_popover_menu_insert;
+    iface->set_active_item = gxk_popover_menu_set_active_item;
 }
 
 //
@@ -127,6 +138,13 @@ static void gxk_popover_menu_append(
         GTK_BOX(menu->box_menuitems),
         gxk_menu_item_from_widget(child)
     );
+}
+
+static GxkMenuShellKind gxk_popover_menu_get_kind(
+    GxkMenuShell* menu_shell
+)
+{
+    return GXK_MENU_SHELL_MENU;
 }
 
 static void gxk_popover_menu_prepend(
@@ -178,6 +196,39 @@ static void gxk_popover_menu_insert(
         gxk_menu_item_from_widget(child),
         sibling
     );
+}
+
+static void gxk_popover_menu_set_active_item(
+    GxkMenuShell* menu_shell,
+    GxkMenuItem*  menu_item,
+    gboolean      popup
+)
+{
+    GxkPopoverMenu* menu = GXK_POPOVER_MENU(menu_shell);
+
+    if (menu->active_item == menu_item)
+    {
+        return;
+    }
+
+    if (menu->active_item)
+    {
+        gtk_widget_unset_state_flags(
+            GTK_WIDGET(menu->active_item),
+            GTK_STATE_FLAG_SELECTED
+        );
+    }
+
+    menu->active_item = menu_item;
+
+    if (menu->active_item)
+    {
+        gtk_widget_set_state_flags(
+            GTK_WIDGET(menu->active_item),
+            GTK_STATE_FLAG_SELECTED,
+            FALSE
+        );
+    }
 }
 
 //

@@ -53,6 +53,16 @@ void gxk_menu_shell_insert(
     iface->insert(menu_shell, child, position);
 }
 
+GxkMenuShellKind gxk_menu_shell_get_kind(
+    GxkMenuShell* menu_shell
+)
+{
+    GxkMenuShellInterface* iface =
+        GXK_MENU_SHELL_GET_IFACE(menu_shell);
+
+    return iface->get_kind(menu_shell);
+}
+
 void gxk_menu_shell_set_active_item(
     GxkMenuShell* menu_shell,
     GxkMenuItem*  menu_item,

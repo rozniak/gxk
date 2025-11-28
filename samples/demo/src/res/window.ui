@@ -8,6 +8,17 @@
         <attribute name="icon">file-new</attribute>
       </item>
 
+      <submenu>
+        <attribute name="label">Recent</attribute>
+
+        <item>
+          <attribute name="label">1. File</attribute>
+        </item>
+        <item>
+          <attribute name="label">2. File</attribute>
+        </item>
+      </submenu>
+
       <section>
         <item>
           <attribute name="label">Open</attribute>

@@ -44,6 +44,9 @@ static void gxk_popover_menu_bar_append(
     GxkMenuShell* menu_shell,
     GtkWidget*    child
 );
+static GxkMenuShellKind gxk_popover_menu_bar_get_kind(
+    GxkMenuShell* menu_shell
+);
 static void gxk_popover_menu_bar_prepend(
     GxkMenuShell* menu_shell,
     GtkWidget*    child
@@ -53,7 +56,6 @@ static void gxk_popover_menu_bar_insert(
     GtkWidget*    child,
     gint          position
 );
-
 static void gxk_popover_menu_bar_set_active_item(
     GxkMenuShell* menu_shell,
     GxkMenuItem*  menu_item,
@@ -168,10 +170,10 @@ static void gxk_popover_menu_bar_menu_shell_interface_init(
     GxkMenuShellInterface* iface
 )
 {
-    iface->append  = gxk_popover_menu_bar_append;
-    iface->prepend = gxk_popover_menu_bar_prepend;
-    iface->insert  = gxk_popover_menu_bar_insert;
-
+    iface->append          = gxk_popover_menu_bar_append;
+    iface->get_kind        = gxk_popover_menu_bar_get_kind;
+    iface->prepend         = gxk_popover_menu_bar_prepend;
+    iface->insert          = gxk_popover_menu_bar_insert;
     iface->set_active_item = gxk_popover_menu_bar_set_active_item;
 }
 
@@ -264,6 +266,13 @@ static void gxk_popover_menu_bar_append(
     );
 }
 
+static GxkMenuShellKind gxk_popover_menu_bar_get_kind(
+    GxkMenuShell* menu_shell
+)
+{
+    return GXK_MENU_SHELL_MENU_BAR;
+}
+
 static void gxk_popover_menu_bar_prepend(
     GxkMenuShell* menu_shell,
     GtkWidget*    child
@@ -305,48 +314,6 @@ static void gxk_popover_menu_bar_insert(
     );
 }
 
-//
-// PUBLIC FUNCTIONS
-//
-GtkWidget* gxk_popover_menu_bar_new_from_model(
-    GMenuModel* menu_model
-)
-{
-    return GTK_WIDGET(
-        g_object_new(
-            GXK_TYPE_POPOVER_MENU_BAR,
-            "menu-model", menu_model,
-            NULL
-        )
-    );
-}
-
-void gxk_popover_menu_bar_bind_model(
-    GxkPopoverMenuBar* menu_bar,
-    GMenuModel*        menu_model
-)
-{
-    // FIXME: Clear out old menu model first
-    if (menu_bar->binding || menu_bar->model)
-    {
-        g_critical("%s", "gxk: menubar: need to clear out existing model!!");
-        return;
-    }
-
-    // FIXME: This is temp stuff!
-    //
-    menu_bar->model = g_object_ref(menu_model);
-
-    menu_bar->binding =
-        gxk_menu_binding_new(
-            GXK_MENU_SHELL(menu_bar),
-            menu_model
-        );
-}
-
-//
-// INTERNAL FUNCTIONS
-//
 static void gxk_popover_menu_bar_set_active_item(
     GxkMenuShell* menu_shell,
     GxkMenuItem*  menu_item,
@@ -415,6 +382,45 @@ static void gxk_popover_menu_bar_set_active_item(
             gtk_widget_grab_focus(GTK_WIDGET(menu_bar->active_item));
         }
     }
+}
+
+//
+// PUBLIC FUNCTIONS
+//
+GtkWidget* gxk_popover_menu_bar_new_from_model(
+    GMenuModel* menu_model
+)
+{
+    return GTK_WIDGET(
+        g_object_new(
+            GXK_TYPE_POPOVER_MENU_BAR,
+            "menu-model", menu_model,
+            NULL
+        )
+    );
+}
+
+void gxk_popover_menu_bar_bind_model(
+    GxkPopoverMenuBar* menu_bar,
+    GMenuModel*        menu_model
+)
+{
+    // FIXME: Clear out old menu model first
+    if (menu_bar->binding || menu_bar->model)
+    {
+        g_critical("%s", "gxk: menubar: need to clear out existing model!!");
+        return;
+    }
+
+    // FIXME: This is temp stuff!
+    //
+    menu_bar->model = g_object_ref(menu_model);
+
+    menu_bar->binding =
+        gxk_menu_binding_new(
+            GXK_MENU_SHELL(menu_bar),
+            menu_model
+        );
 }
 
 //
