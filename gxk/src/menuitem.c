@@ -245,6 +245,35 @@ void gxk_menu_item_set_submenu_popped(
         return;
     }
 
+    // Set the popover direction if needed
+    //
+    GtkWidget* parent_shell =
+        gtk_widget_get_ancestor(
+            GTK_WIDGET(menu_item),
+            GXK_TYPE_MENU_SHELL
+        );
+
+    if (parent_shell)
+    {
+        if (
+            gxk_menu_shell_get_kind(GXK_MENU_SHELL(parent_shell))
+                == GXK_MENU_SHELL_MENU_BAR
+        )
+        {
+            gtk_popover_set_position(
+                GTK_POPOVER(menu_item->popover),
+                GTK_POS_BOTTOM
+            );
+        }
+        else
+        {
+            gtk_popover_set_position(
+                GTK_POPOVER(menu_item->popover),
+                GTK_POS_RIGHT
+            );
+        }
+    }
+
     if (popped)
     {
         gtk_popover_popup(
