@@ -24,5 +24,20 @@ void gxk_init(void)
 
     gtk_init();
 
+    // Add default styles
+    //
+    GtkCssProvider* css_provider = gtk_css_provider_new();
+
+    gtk_css_provider_load_from_resource(
+        css_provider,
+        "/uk/oddmatics/gxk/gxk/appstyles.css"
+    );
+
+    gtk_style_context_add_provider_for_display(
+        gdk_display_get_default(),
+        GTK_STYLE_PROVIDER(css_provider),
+        GTK_STYLE_PROVIDER_PRIORITY_FALLBACK
+    );
+
     S_INITIALIZED = TRUE;
 }

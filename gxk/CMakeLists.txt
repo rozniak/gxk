@@ -9,10 +9,14 @@ project(
 
 include(GNUInstallDirs)
 
+include(../cmake/glib-compile-resources.cmake)
+
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(GTK4 REQUIRED gtk4)
+
+gxk_glib_compile_resources()
 
 add_library(
     gxk-4
@@ -30,6 +34,7 @@ add_library(
     public/popovermenu.h
     src/popovermenubar.c
     public/popovermenubar.h
+    src/resources.c
 )
 
 target_include_directories(
