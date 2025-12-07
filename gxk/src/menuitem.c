@@ -6,6 +6,15 @@
 #include "../public/popovermenu.h"
 
 //
+// PRIVATE ENUMS
+//
+enum
+{
+    SIGNAL_POPPING_MENU = 0,
+    N_SIGNALS
+};
+
+//
 // FORWARD DECLARATIONS
 //
 static void gxk_menu_item_dispose(
@@ -28,6 +37,11 @@ static void on_event_pressed(
     gdouble          y,
     gpointer         user_data
 );
+
+//
+// STATIC DATA
+//
+static gint gxk_menu_item_signals[N_SIGNALS] = { 0 };
 
 //
 // GOBJECT CLASS/INSTANCE DEFINITIONS
@@ -58,6 +72,19 @@ static void gxk_menu_item_class_init(
     GtkWidgetClass* widget_class = GTK_WIDGET_CLASS(klass);
 
     object_class->dispose = gxk_menu_item_dispose;
+
+    gxk_menu_item_signals[SIGNAL_POPPING_MENU] =
+        g_signal_new(
+            "popping-menu",
+            G_TYPE_FROM_CLASS(object_class),
+            G_SIGNAL_RUN_FIRST,
+            0,
+            NULL,
+            NULL,
+            g_cclosure_marshal_VOID__VOID,
+            G_TYPE_NONE,
+            0
+        );
 
     gtk_widget_class_set_css_name(
         widget_class,
@@ -167,6 +194,13 @@ GtkWidget* gxk_menu_item_from_widget(
     return menu_item;
 }
 
+GtkWidget* gxk_menu_item_get_submenu(
+    GxkMenuItem* menu_item
+)
+{
+    return menu_item->popover;
+}
+
 gboolean gxk_menu_item_get_submenu_popped(
     GxkMenuItem* menu_item
 )
@@ -240,6 +274,15 @@ void gxk_menu_item_set_submenu_popped(
     gboolean     popped
 )
 {
+    if (popped)
+    {
+        g_signal_emit(
+            menu_item,
+            gxk_menu_item_signals[SIGNAL_POPPING_MENU],
+            0
+        );
+    }
+
     if (!menu_item->popover)
     {
         return;
@@ -316,16 +359,16 @@ static void on_event_contains_pointer(
 
     if (gtk_event_controller_motion_contains_pointer(controller))
     {
+        if (gxk_menu_shell_get_kind(menu_shell) == GXK_MENU_SHELL_MENU)
+        {
+            gxk_menu_item_set_submenu_popped(menu_item, TRUE);
+        }
+
         gxk_menu_shell_set_active_item(
             menu_shell,
             menu_item,
             FALSE
         );
-
-        if (gxk_menu_shell_get_kind(menu_shell) == GXK_MENU_SHELL_MENU)
-        {
-            gxk_menu_item_set_submenu_popped(menu_item, TRUE);
-        }
     }
     else
     {

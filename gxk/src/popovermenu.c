@@ -20,6 +20,9 @@ static void gxk_popover_menu_append(
     GxkMenuShell* menu_shell,
     GtkWidget*    child
 );
+static void gxk_popover_menu_close_open_menus(
+    GxkMenuShell* menu_shell
+);
 static GxkMenuShellKind gxk_popover_menu_get_kind(
     GxkMenuShell* menu_shell
 );
@@ -38,6 +41,16 @@ static void gxk_popover_menu_set_active_item(
     gboolean      popup
 );
 
+static GtkWidget* gxk_popover_menu_make_menu_item(
+    GxkPopoverMenu* menu,
+    GtkWidget*      child
+);
+
+static void on_menu_item_popping_menu(
+    GxkMenuItem* menu_item,
+    gpointer     user_data
+);
+
 //
 // GOBJECT CLASS/INSTANCE DEFINITIONS
 //
@@ -47,8 +60,9 @@ struct _GxkPopoverMenu
 
     // UI
     //
-    GxkMenuItem* active_item;
-    GtkWidget*   box_menuitems;
+    GxkMenuItem*  active_item;
+    GxkMenuShell* active_submenu;
+    GtkWidget*    box_menuitems;
 };
 
 //
@@ -99,11 +113,12 @@ static void gxk_popover_menu_menu_shell_interface_init(
     GxkMenuShellInterface* iface
 )
 {
-    iface->append          = gxk_popover_menu_append;
-    iface->get_kind        = gxk_popover_menu_get_kind;
-    iface->prepend         = gxk_popover_menu_prepend;
-    iface->insert          = gxk_popover_menu_insert;
-    iface->set_active_item = gxk_popover_menu_set_active_item;
+    iface->append           = gxk_popover_menu_append;
+    iface->close_open_menus = gxk_popover_menu_close_open_menus;
+    iface->get_kind         = gxk_popover_menu_get_kind;
+    iface->prepend          = gxk_popover_menu_prepend;
+    iface->insert           = gxk_popover_menu_insert;
+    iface->set_active_item  = gxk_popover_menu_set_active_item;
 }
 
 //
@@ -136,7 +151,24 @@ static void gxk_popover_menu_append(
 
     gtk_box_append(
         GTK_BOX(menu->box_menuitems),
-        gxk_menu_item_from_widget(child)
+        gxk_popover_menu_make_menu_item(menu, child)
+    );
+}
+
+static void gxk_popover_menu_close_open_menus(
+    GxkMenuShell* menu_shell
+)
+{
+    GxkPopoverMenu* menu = GXK_POPOVER_MENU(menu_shell);
+
+    if (!(menu->active_item) || !(menu->active_submenu))
+    {
+        return;
+    }
+
+    gxk_menu_item_set_submenu_popped(
+        menu->active_item,
+        FALSE
     );
 }
 
@@ -156,7 +188,7 @@ static void gxk_popover_menu_prepend(
 
     gtk_box_prepend(
         GTK_BOX(menu->box_menuitems),
-        gxk_menu_item_from_widget(child)
+        gxk_popover_menu_make_menu_item(menu, child)
     );
 }
 
@@ -193,7 +225,7 @@ static void gxk_popover_menu_insert(
 
     gtk_box_insert_child_after(
         GTK_BOX(menu->box_menuitems),
-        gxk_menu_item_from_widget(child),
+        gxk_popover_menu_make_menu_item(menu, child),
         sibling
     );
 }
@@ -242,4 +274,46 @@ GtkWidget* gxk_popover_menu_new(void)
             NULL
         )
     );
+}
+
+//
+// PRIVATE FUNCTIONS
+//
+static GtkWidget* gxk_popover_menu_make_menu_item(
+    GxkPopoverMenu* menu,
+    GtkWidget*      child
+)
+{
+    GtkWidget* menu_item = gxk_menu_item_from_widget(child);
+
+    g_signal_connect(
+        menu_item,
+        "popping-menu",
+        G_CALLBACK(on_menu_item_popping_menu),
+        menu
+    );
+
+    return menu_item;
+}
+
+//
+// CALLBACKS
+//
+static void on_menu_item_popping_menu(
+    GxkMenuItem* menu_item,
+    gpointer     user_data
+)
+{
+    GxkPopoverMenu* menu = GXK_POPOVER_MENU(user_data);
+
+    // Close existing popped menu
+    //
+    GtkWidget* submenu = gxk_menu_item_get_submenu(menu_item);
+
+    if (!submenu || GXK_MENU_SHELL(submenu) != menu->active_submenu)
+    {
+        gxk_popover_menu_close_open_menus(GXK_MENU_SHELL(menu));
+    }
+
+    menu->active_submenu = GXK_MENU_SHELL(submenu);
 }

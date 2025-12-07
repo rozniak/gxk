@@ -44,6 +44,9 @@ static void gxk_popover_menu_bar_append(
     GxkMenuShell* menu_shell,
     GtkWidget*    child
 );
+static void gxk_popover_menu_bar_close_open_menus(
+    GxkMenuShell* menu_shell
+);
 static GxkMenuShellKind gxk_popover_menu_bar_get_kind(
     GxkMenuShell* menu_shell
 );
@@ -62,9 +65,18 @@ static void gxk_popover_menu_bar_set_active_item(
     gboolean      popup
 );
 
+static GtkWidget* gxk_popover_menu_bar_make_menu_item(
+    GxkPopoverMenuBar* menu_bar,
+    GtkWidget*         child
+);
+
 static void on_event_leave(
     GtkEventControllerMotion* self,
     gpointer                  user_data
+);
+static void on_menu_item_popping_menu(
+    GxkMenuItem* menu_item,
+    gpointer     user_data
 );
 static void on_popover_unmap(
     GtkWidget* self,
@@ -88,7 +100,8 @@ struct _GxkPopoverMenuBar
     GxkMenuBinding* binding;
     GMenuModel*     model;
 
-    GxkMenuItem* active_item;
+    GxkMenuItem*  active_item;
+    GxkMenuShell* active_submenu;
 };
 
 //
@@ -170,11 +183,12 @@ static void gxk_popover_menu_bar_menu_shell_interface_init(
     GxkMenuShellInterface* iface
 )
 {
-    iface->append          = gxk_popover_menu_bar_append;
-    iface->get_kind        = gxk_popover_menu_bar_get_kind;
-    iface->prepend         = gxk_popover_menu_bar_prepend;
-    iface->insert          = gxk_popover_menu_bar_insert;
-    iface->set_active_item = gxk_popover_menu_bar_set_active_item;
+    iface->append           = gxk_popover_menu_bar_append;
+    iface->close_open_menus = gxk_popover_menu_bar_close_open_menus;
+    iface->get_kind         = gxk_popover_menu_bar_get_kind;
+    iface->prepend          = gxk_popover_menu_bar_prepend;
+    iface->insert           = gxk_popover_menu_bar_insert;
+    iface->set_active_item  = gxk_popover_menu_bar_set_active_item;
 }
 
 //
@@ -257,12 +271,29 @@ static void gxk_popover_menu_bar_append(
     GtkWidget*    child
 )
 {
-    GtkWidget* menu_item = gxk_menu_item_from_widget(child);
+    GxkPopoverMenuBar* menu_bar = GXK_POPOVER_MENU_BAR(menu_shell);
 
     gtk_widget_insert_before(
-        menu_item,
+        gxk_popover_menu_bar_make_menu_item(menu_bar, child),
         GTK_WIDGET(menu_shell),
         NULL
+    );
+}
+
+static void gxk_popover_menu_bar_close_open_menus(
+    GxkMenuShell* menu_shell
+)
+{
+    GxkPopoverMenuBar* menu_bar = GXK_POPOVER_MENU_BAR(menu_shell);
+
+    if (!(menu_bar->active_submenu))
+    {
+        return;
+    }
+
+    gxk_menu_item_set_submenu_popped(
+        menu_bar->active_item,
+        FALSE
     );
 }
 
@@ -278,10 +309,10 @@ static void gxk_popover_menu_bar_prepend(
     GtkWidget*    child
 )
 {
-    GtkWidget* menu_item = gxk_menu_item_from_widget(child);
+    GxkPopoverMenuBar* menu_bar = GXK_POPOVER_MENU_BAR(menu_shell);
 
     gtk_widget_insert_after(
-        menu_item,
+        gxk_popover_menu_bar_make_menu_item(menu_bar, child),
         GTK_WIDGET(menu_shell),
         NULL
     );
@@ -293,9 +324,10 @@ static void gxk_popover_menu_bar_insert(
     gint          position
 )
 {
-    GtkWidget* menu_item = gxk_menu_item_from_widget(child);
+    GxkPopoverMenuBar* menu_bar = GXK_POPOVER_MENU_BAR(menu_shell);
 
-    GtkWidget* sibling = gtk_widget_get_first_child(GTK_WIDGET(menu_shell));
+    GtkWidget* sibling =
+        gtk_widget_get_first_child(GTK_WIDGET(menu_shell));
 
     for (gint i = 0; i < position; i++)
     {
@@ -308,7 +340,7 @@ static void gxk_popover_menu_bar_insert(
     }
 
     gtk_widget_insert_before(
-        menu_item,
+        gxk_popover_menu_bar_make_menu_item(menu_bar, child),
         GTK_WIDGET(menu_shell),
         sibling
     );
@@ -424,6 +456,26 @@ void gxk_popover_menu_bar_bind_model(
 }
 
 //
+// PRIVATE FUNCTIONS
+//
+static GtkWidget* gxk_popover_menu_bar_make_menu_item(
+    GxkPopoverMenuBar* menu_bar,
+    GtkWidget*         child
+)
+{
+    GtkWidget* menu_item = gxk_menu_item_from_widget(child);
+
+    g_signal_connect(
+        menu_item,
+        "popping-menu",
+        G_CALLBACK(on_menu_item_popping_menu),
+        menu_bar
+    );
+
+    return menu_item;
+}
+
+//
 // CALLBACKS
 //
 static void on_event_leave(
@@ -451,6 +503,17 @@ static void on_event_leave(
             FALSE
         );
     }
+}
+
+static void on_menu_item_popping_menu(
+    GxkMenuItem* menu_item,
+    gpointer     user_data
+)
+{
+    GxkPopoverMenuBar* menu_bar = GXK_POPOVER_MENU_BAR(user_data);
+
+    menu_bar->active_submenu =
+        GXK_MENU_SHELL(gxk_menu_item_get_submenu(menu_item));
 }
 
 /*

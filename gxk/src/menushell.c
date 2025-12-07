@@ -30,6 +30,16 @@ void gxk_menu_shell_append(
     iface->append(menu_shell, child);
 }
 
+void gxk_menu_shell_close_open_menus(
+    GxkMenuShell* menu_shell
+)
+{
+    GxkMenuShellInterface* iface =
+        GXK_MENU_SHELL_GET_IFACE(menu_shell);
+
+    iface->close_open_menus(menu_shell);
+}
+
 void gxk_menu_shell_prepend(
     GxkMenuShell* menu_shell,
     GtkWidget*    child
