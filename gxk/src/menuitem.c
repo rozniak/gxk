@@ -14,11 +14,51 @@ enum
     N_SIGNALS
 };
 
+enum
+{
+    PROP_ACTION_NAME = 1,
+    PROP_ACTION_TARGET
+};
+
 //
 // FORWARD DECLARATIONS
 //
+static void gxk_menu_item_actionable_interface_init(
+    GtkActionableInterface* iface
+);
+
 static void gxk_menu_item_dispose(
     GObject* object
+);
+static void gxk_menu_item_finalize(
+    GObject* object
+);
+static void gxk_menu_item_get_property(
+    GObject*    object,
+    guint       prop_id,
+    GValue*     value,
+    GParamSpec* pspec
+);
+static void gxk_menu_item_set_property(
+    GObject*      object,
+    guint         prop_id,
+    const GValue* value,
+    GParamSpec*   pspec
+);
+
+static const gchar* gxk_menu_item_get_action_name(
+    GtkActionable* actionable
+);
+static void gxk_menu_item_set_action_name(
+    GtkActionable* actionable,
+    const gchar*   action_name
+);
+static GVariant* gxk_menu_item_get_action_target_value(
+    GtkActionable* actionable
+);
+static void gxk_menu_item_set_action_target_value(
+    GtkActionable* actionable,
+    GVariant*      target_value
 );
 
 static void gxk_menu_item_open_submenu(
@@ -53,15 +93,24 @@ struct _GxkMenuItem
     // UI
     //
     GtkWidget* popover;
+
+    // GtkActionable
+    //
+    gchar*    action_name;
+    GVariant* action_value;
 };
 
 //
 // GOBJECT TYPE DEFINITION & CTORS
 //
-G_DEFINE_TYPE(
+G_DEFINE_TYPE_WITH_CODE(
     GxkMenuItem,
     gxk_menu_item,
-    GTK_TYPE_WIDGET
+    GTK_TYPE_WIDGET,
+    G_IMPLEMENT_INTERFACE(
+        GTK_TYPE_ACTIONABLE,
+        gxk_menu_item_actionable_interface_init
+    )
 )
 
 static void gxk_menu_item_class_init(
@@ -71,7 +120,10 @@ static void gxk_menu_item_class_init(
     GObjectClass*   object_class = G_OBJECT_CLASS(klass);
     GtkWidgetClass* widget_class = GTK_WIDGET_CLASS(klass);
 
-    object_class->dispose = gxk_menu_item_dispose;
+    object_class->dispose      = gxk_menu_item_dispose;
+    object_class->finalize     = gxk_menu_item_finalize;
+    object_class->get_property = gxk_menu_item_get_property;
+    object_class->set_property = gxk_menu_item_set_property;
 
     gxk_menu_item_signals[SIGNAL_POPPING_MENU] =
         g_signal_new(
@@ -85,6 +137,17 @@ static void gxk_menu_item_class_init(
             G_TYPE_NONE,
             0
         );
+
+    g_object_class_override_property(
+        object_class,
+        PROP_ACTION_NAME,
+        "action-name"
+    );
+    g_object_class_override_property(
+        object_class,
+        PROP_ACTION_TARGET,
+        "action-target"
+    );
 
     gtk_widget_class_set_css_name(
         widget_class,
@@ -144,6 +207,16 @@ static void gxk_menu_item_init(
     );
 }
 
+static void gxk_menu_item_actionable_interface_init(
+    GtkActionableInterface* iface
+)
+{
+    iface->get_action_name         = gxk_menu_item_get_action_name;
+    iface->set_action_name         = gxk_menu_item_set_action_name;
+    iface->get_action_target_value = gxk_menu_item_get_action_target_value;
+    iface->set_action_target_value = gxk_menu_item_set_action_target_value;
+}
+
 //
 // CLASS VIRTUAL METHODS
 //
@@ -151,6 +224,8 @@ static void gxk_menu_item_dispose(
     GObject* object
 )
 {
+    GxkMenuItem* menu_item = GXK_MENU_ITEM(object);
+
     GtkWidget* child = gtk_widget_get_first_child(GTK_WIDGET(object));
 
     if (child)
@@ -158,8 +233,134 @@ static void gxk_menu_item_dispose(
         gtk_widget_unparent(child);
     }
 
+    if (menu_item->action_value)
+    {
+        g_variant_unref(menu_item->action_value);
+        menu_item->action_value = NULL;
+    }
+
     (G_OBJECT_CLASS(gxk_menu_item_parent_class))
         ->dispose(object);
+}
+
+static void gxk_menu_item_finalize(
+    GObject* object
+)
+{
+    GxkMenuItem* menu_item = GXK_MENU_ITEM(object);
+
+    g_clear_pointer(
+        &(menu_item->action_name),
+        (GDestroyNotify) g_free
+    );
+
+    (G_OBJECT_CLASS(gxk_menu_item_parent_class))
+        ->finalize(object);
+}
+
+static void gxk_menu_item_get_property(
+    GObject*    object,
+    guint       prop_id,
+    GValue*     value,
+    GParamSpec* pspec
+)
+{
+    GxkMenuItem* menu_item = GXK_MENU_ITEM(object);
+
+    switch (prop_id)
+    {
+        case PROP_ACTION_NAME:
+            g_value_set_string(value, menu_item->action_name);
+            break;
+
+        case PROP_ACTION_TARGET:
+            g_value_set_variant(value, menu_item->action_value);
+            break;
+
+        default:
+            G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+            break;
+    }
+}
+
+static void gxk_menu_item_set_property(
+    GObject*      object,
+    guint         prop_id,
+    const GValue* value,
+    GParamSpec*   pspec
+)
+{
+    switch (prop_id)
+    {
+        case PROP_ACTION_NAME:
+            gxk_menu_item_set_action_name(
+                GTK_ACTIONABLE(object),
+                g_value_get_string(value)
+            );
+            break;
+
+        case PROP_ACTION_TARGET:
+            gxk_menu_item_set_action_target_value(
+                GTK_ACTIONABLE(object),
+                g_value_get_variant(value)
+            );
+            break;
+
+        default:
+            G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+            break;
+    }
+}
+
+//
+// INTERFACE METHODS (GtkActionable)
+//
+static const gchar* gxk_menu_item_get_action_name(
+    GtkActionable* actionable
+)
+{
+    return (GXK_MENU_ITEM(actionable))->action_name;
+}
+
+static void gxk_menu_item_set_action_name(
+    GtkActionable* actionable,
+    const gchar*   action_name
+)
+{
+    GxkMenuItem* menu_item = GXK_MENU_ITEM(actionable);
+
+    g_clear_pointer(
+        &(menu_item->action_name),
+        (GDestroyNotify) g_free
+    );
+
+    menu_item->action_name = g_strdup(action_name);
+}
+
+static GVariant* gxk_menu_item_get_action_target_value(
+    GtkActionable* actionable
+)
+{
+    return (GXK_MENU_ITEM(actionable))->action_value;
+}
+
+static void gxk_menu_item_set_action_target_value(
+    GtkActionable* actionable,
+    GVariant*      target_value
+)
+{
+    GxkMenuItem* menu_item = GXK_MENU_ITEM(actionable);
+
+    if (menu_item->action_value)
+    {
+        g_variant_unref(menu_item->action_value);
+        menu_item->action_value = NULL;
+    }
+
+    if (target_value)
+    {
+        menu_item->action_value = g_variant_ref_sink(target_value);
+    }
 }
 
 //

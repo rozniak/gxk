@@ -538,7 +538,11 @@ static void gxk_menu_binding_insert_item(
         );
 
         g_free(action_name);
-        g_variant_unref(action_target);
+
+        if (action_target)
+        {
+            g_variant_unref(action_target);
+        }
     }
 
     if (label)
