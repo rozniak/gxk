@@ -611,4 +611,13 @@ static void on_event_pressed(
         menu_item,
         TRUE
     );
+
+    if (menu_item->action_name)
+    {
+        gtk_widget_activate_action_variant(
+            GTK_WIDGET(menu_item),
+            menu_item->action_name,
+            menu_item->action_value
+        );
+    }
 }
