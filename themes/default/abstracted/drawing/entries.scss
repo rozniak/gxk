@@ -52,14 +52,16 @@
     color: $osd_insensitive_fg_color;
     border-color: $osd_borders_color;
     background-color: $osd_insensitive_bg_color;
-    @if $t==osd-backdrop {
-      color: $osd_text_color;
-      border-color: $osd_borders_color;
-      background-color: transparentize(opacify($osd_borders_color, 1), 0.5);
-      background-clip: padding-box;
-    }
-    @if $t==block_cursor {
-      color: $base_color;
-      background-color: $text_color;
-    }
+    background-clip: padding-box;
   }
+  @if $t==osd-backdrop {
+    color: $osd_text_color;
+    border-color: $osd_borders_color;
+    background-color: transparentize(opacify($osd_borders_color, 1), 0.5);
+    background-clip: padding-box;
+  }
+  @if $t==block_cursor {
+    color: $base_color;
+    background-color: $text_color;
+  }
+}
