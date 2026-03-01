@@ -606,6 +606,11 @@ static void on_event_pressed(
             )
         );
 
+    if (!menu_shell)
+    {
+        return;
+    }
+
     gxk_menu_shell_set_active_item(
         menu_shell,
         menu_item,
@@ -614,6 +619,28 @@ static void on_event_pressed(
 
     if (menu_item->action_name)
     {
+        // Close open submenus
+        //
+        GtkWidget* parent = GTK_WIDGET(menu_shell);
+
+        while (
+            (parent = gtk_widget_get_parent(parent)) &&
+            (
+                parent =
+                    gtk_widget_get_ancestor(
+                        parent,
+                        GXK_TYPE_MENU_SHELL
+                    )
+            )
+        )
+        {
+            menu_shell = GXK_MENU_SHELL(parent);
+        }
+
+        gxk_menu_shell_close_open_menus(menu_shell);
+
+        // Activate the action associated with this item
+        //
         gtk_widget_activate_action_variant(
             GTK_WIDGET(menu_item),
             menu_item->action_name,

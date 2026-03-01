@@ -357,8 +357,6 @@ static void gxk_popover_menu_bar_set_active_item(
     gboolean changed      = menu_bar->active_item != menu_item;
     gboolean popup_active = FALSE;
 
-    g_message("%s", "Enter");
-
     if (menu_bar->active_item)
     {
         popup_active =
