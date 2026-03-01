@@ -18,4 +18,5 @@ CMakeUserPresets.json
 # Build output
 #
 [Bb]uild/
+.sass-cache/
 resources.c
