@@ -1,0 +1,5 @@
+//
+// Menu colour definitions
+//
+$menu_color: $base_color;
+$menu_selected_color: if($variant == 'light', darken($bg_color, 6%), darken($bg_color, 8%));
