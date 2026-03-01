@@ -1,0 +1,44 @@
+//
+// Generic drawing related bits
+//
+
+//
+// Helper mixin for drawing visible focus rings
+//
+// If $target is specified, the focus ring is applied to the specified child element.
+// If $outer is true, the focus ring extends outward. Otherwise, it extends inward.
+// If $within is true, use focus-within instead of focus:focus-visible
+//
+@mixin focus-ring($target: null, $width: 2px, $offset: -$width, $outer: false, $focus-state: 'focus:focus-visible', $fc: $focus_border_color) {
+  transition-property: outline, outline-width, outline-offset, outline-color;
+  transition-duration: 300ms;
+  animation-timing-function: ease-in-out;
+  & #{$target} {
+    outline: 0 solid transparent;
+    outline-offset: if($outer, $offset + 4px, $offset + $width + 4px);
+  }
+
+  &:#{$focus-state} #{$target} {
+    outline-color: $fc;
+    outline-width: $width;
+    outline-offset: $offset;
+  }
+}
+
+@mixin _shadows($list...) {
+  //
+  // Helper mixin to stack up to box-shadows;
+  //
+  $shadows: null;
+
+  @each $shadow in $list {
+    @if $shadow!=none { $shadows: $shadows, $shadow; }
+  }
+
+  box-shadow: $shadows;
+}
+
+@function _border_color($c, $darker: false) {
+  @if $darker == true { @return darken($c, 20%); }
+  @else { @return darken($c, 15%); }
+}
