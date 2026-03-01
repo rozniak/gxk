@@ -1,0 +1,69 @@
+//
+// Frame styles
+//
+
+frame,
+.frame {
+  border: 1px solid $borders_color;
+}
+
+frame {
+  border-radius: $window_radius;
+
+  > label {
+    margin: 4px;
+  }
+}
+
+actionbar > revealer > box {
+  padding: 6px;
+  border-top: 1px solid $borders_color;
+
+  &, > box.start, > box.end {
+    border-spacing: 6px;
+  }
+}
+
+scrolledwindow {
+  // This is used when content is touch-dragged past boundaries.
+  // draws a box on top of the content, the size changes programmatically.
+  > overshoot {
+    &.top {
+      @include overshoot(top);
+    }
+
+    &.bottom {
+      @include overshoot(bottom);
+    }
+
+    &.left {
+      @include overshoot(left);
+    }
+
+    &.right {
+      @include overshoot(right);
+    }
+  }
+
+  > junction { // the small square between two scrollbars
+    // Only color the top-left (or top right in RTL) pixel, to visually connect
+    // the borders of the two scrollbars.
+
+    background: $borders_color,
+                linear-gradient(to bottom, transparent 1px, $scrollbar_bg_color 1px),
+                linear-gradient(to right, transparent 1px, $scrollbar_bg_color 1px);
+
+    &:dir(rtl) {
+      background: $borders_color,
+                  linear-gradient(to bottom, transparent 1px, $scrollbar_bg_color 1px),
+                  linear-gradient(to left, transparent 1px, $scrollbar_bg_color 1px);
+    }
+  }
+}
+
+//vbox and hbox separators
+separator {
+  background: lighten($borders_color, 5%);
+  min-width: 1px;
+  min-height: 1px;
+}

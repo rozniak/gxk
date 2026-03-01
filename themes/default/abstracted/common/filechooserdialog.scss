@@ -1,0 +1,49 @@
+//
+// File chooser dialog styles
+//
+
+filechooser {
+  .dialog-action-box {
+    border-top: 1px solid $borders_color;
+  }
+
+  #pathbarbox { border-bottom: 1px solid $bg_color; }
+
+  gridview child {
+    border-radius: 12px;
+    margin: 12px;
+
+    &:hover {
+      background-color: gtkalpha(currentColor, .04);
+    }
+
+    &:active {
+      background-color: gtkalpha(currentColor, .08);
+    }
+
+    &:selected {
+      background-color: gtkalpha($selected_bg_color, .15);
+      color: inherit;
+    }
+
+    &:selected:hover {
+      background-color: gtkalpha($selected_bg_color, .20);
+    }
+
+    &:selected:active {
+      background-color: gtkalpha($selected_bg_color, .25);
+    }
+
+    & filethumbnail image {
+      filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3));
+    }
+  }
+}
+
+filechooserbutton>button>box {
+  border-spacing: 6px;
+}
+filechooserbutton:drop(active) {
+  box-shadow: none;
+  border-color: transparent;
+}

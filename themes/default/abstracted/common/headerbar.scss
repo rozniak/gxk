@@ -1,0 +1,188 @@
+//
+// Headerbar styles
+//
+
+%titlebar,
+headerbar {
+  padding: 0 6px;
+  min-height: 46px;
+  border-width: 0 0 1px;
+  border-style: solid;
+  border-color: $alt_borders_color;
+  border-radius: 0;
+
+  @include headerbar_fill(darken($bg_color, 10%));
+
+  &:backdrop {
+    border-color: $backdrop_borders_color;
+    background-color: $bg_color;
+    background-image: none;
+
+    transition: $backdrop_transition;
+
+    .title { filter: opacity(.5); }
+  }
+
+  .title {
+    padding-left: 12px;
+    padding-right: 12px;
+    font-weight: bold;
+  }
+
+  .subtitle {
+    font-size: smaller;
+    padding-left: 12px;
+    padding-right: 12px;
+
+    @extend .dim-label;
+  }
+
+  /* Darken switchbuttons for headerbars. issue #1588 */
+  stackswitcher > button:checked,
+  button.toggle:checked {
+
+    background: if($variant == 'light', image(darken($bg_color, 17%)), image(darken($bg_color, 9%)));
+    border-color: darken($borders_color, 3%);
+    border-top-color: darken($borders_color, 8%);
+    &:backdrop {
+      @include button(backdrop-active);
+    }
+  }
+
+  // squared corners when the window is maximized, tiled, or fullscreen
+  .tiled &,
+  .tiled-top &,
+  .tiled-left &,
+  .tiled-right &,
+  .tiled-bottom &,
+  .maximized &,
+  .fullscreen & {
+    &:backdrop, & {
+      border-radius: 0;
+    }
+  }
+
+  &.default-decoration {
+    min-height: 28px;
+    padding: 4px;
+
+    windowcontrols {
+      button,
+      menubutton {
+        min-height: 26px;
+        min-width: 26px;
+        margin: 0;
+        padding: 0;
+      }
+
+      menubutton button {
+        min-height: 20px;
+        min-width: 20px;
+        margin: 0;
+        padding: 4px;
+      }
+    }
+  }
+
+  .solid-csd & {
+    &:backdrop, & {
+      &:dir(rtl), &:dir(ltr) { // specificity bump
+        margin-left: -1px;
+        margin-right: -1px;
+        margin-top: -1px;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+headerbar {
+  > windowhandle > box {
+    &,
+    > box.start,
+    > box.end {
+      border-spacing: 6px;
+    }
+  }
+
+  // add vertical margins to common widget on the headerbar to avoid them spanning the whole height
+  entry,
+  spinbutton,
+  separator:not(.sidebar),
+  button,
+  menubutton {
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+
+  windowcontrols {
+    > button {
+      margin: 0;
+    }
+
+    &.start {
+      margin-left: -6px;
+
+      > button:first-child {
+        padding-left: 6px;
+      }
+    }
+    &.end {
+      margin-right: -6px;
+
+      > button:last-child {
+        padding-right: 6px;
+      }
+    }
+  }
+
+  // Reset margins for buttons inside menubutton
+  menubutton > button {
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+
+  switch {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}
+
+.titlebar:not(headerbar) {
+  window.csd > & {
+    // in csd we assume every titlebar is a headerbar so reset anything, this is needed for split toolbars cases
+    padding: 0;
+    background-color: transparent;
+    background-image: none;
+    border-style: none;
+    border-color: transparent;
+  }
+
+  separator { background-color: $borders_color; }  // FIXME: use darker border?
+
+  @extend %titlebar;
+}
+
+// Development versions of apps to use a differently styled headerbar
+
+window.devel {
+  headerbar.titlebar {
+    $c: darken($bg_color, 10%);
+    $gradient: cross-fade(10% -gtk-icontheme("system-run-symbolic"), image(transparent)) 90% 0/256px 256px no-repeat,
+               linear-gradient(to right, transparent 65%, transparentize($selected_bg_color, 0.8)),
+               linear-gradient(to top, darken($c, 3%), $c 3px, lighten($c, 6%));
+    @if $variant == 'dark' {
+      $gradient: cross-fade(10% -gtk-icontheme("system-run-symbolic"), image(transparent)) 90% 0/256px 256px no-repeat,
+                 linear-gradient(to right, transparent 65%, transparentize($selected_bg_color, 0.9)),
+                 linear-gradient(to top, lighten($c, 3%) 3px, lighten($c, 5%));
+    }
+
+    background: $bg_color $gradient;
+
+    &:backdrop {
+      background: $bg_color cross-fade(10% -gtk-icontheme("system-run-symbolic"), image(transparent)) 90% 0/256px 256px no-repeat,
+                  image($bg_color); /* background-color would flash */
+    }
+  }
+}

@@ -1,0 +1,25 @@
+//
+// 'Data table' styles
+//
+
+/********************************************************
+ * Data Tables                                          *
+ * treeview like tables with individual focusable cells *
+ * https://gitlab.gnome.org/GNOME/gtk/-/issues/2929     *
+ ********************************************************/
+columnview row:not(:selected) cell editablelabel:not(.editing):focus-within {
+  outline: 2px solid $focus_border_color;
+}
+
+columnview row:not(:selected) cell editablelabel.editing:focus-within {
+  outline: 2px solid $selected_bg_color;
+}
+
+columnview row:not(:selected) cell editablelabel.editing text selection {
+  background-color: $backdrop_selected_bg_color;
+  color: transparent;
+  &:focus-within {
+    background-color: $selected_text_bg_color;
+    color: $fg_color;
+  }
+}

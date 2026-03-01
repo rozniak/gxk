@@ -1,0 +1,218 @@
+//
+// Styles for basic widgets and states
+//
+
+.background {
+  color: $fg_color;
+  background-color: $bg_color;
+
+  &:backdrop {
+    text-shadow: none;
+    -gtk-icon-shadow: none;
+  }
+}
+
+dnd {
+  color: $fg-color;
+}
+
+.normal-icons {
+  -gtk-icon-size: 16px;
+}
+
+.large-icons {
+  -gtk-icon-size: 32px;
+}
+
+image:disabled {
+  -gtk-icon-filter: opacity(0.5);
+}
+
+picture:disabled {
+  opacity: 0.5;
+}
+
+.view,
+%view {
+  color: $text_color;
+  background-color: $base_color;
+
+  &:disabled {
+    color: $insensitive_fg_color;
+    background-color: $insensitive_bg_color;
+  }
+
+  &:selected {
+    &:focus, & {
+      @extend %selected_items;
+
+      border-radius: 3px;
+    }
+  }
+}
+
+textview {
+  > text {
+    @extend %view;
+
+    background-color: transparent;
+
+    > selection {
+      background-color: $backdrop_selected_bg_color;
+
+      &:focus-within {
+         background-color: $selected_text_bg_color;
+      }
+    }
+  }
+
+  &:drop(active) {
+    caret-color: $drop_target_color;
+  }
+}
+
+textview > border { background-color: mix($bg_color, $base_color, 50%); }
+
+iconview {
+  @extend .view;
+
+  @include focus-ring();
+
+  @if $contrast == 'high' {
+    &:selected {
+      box-shadow: inset 0 0 0 1px $borders_color;
+    }
+  }
+
+
+  &:drop(active) {
+    box-shadow: none;
+  }
+
+  > dndtarget:drop(active) {
+    border-style: solid;
+    border-width: 1px;
+    border-color: $selected_borders_color;
+  }
+}
+
+rubberband {
+  border: 1px solid darken($selected_bg_color, 10%);
+  background-color: transparentize(darken($selected_bg_color, 10%), 0.8);
+}
+
+flowbox {
+  > rubberband { @extend rubberband; }
+
+  > flowboxchild {
+    padding: 3px;
+    transition: $focus_transition;
+
+    @include focus-ring();
+
+    &:selected {
+      outline-color: $alt_focus_border_color;
+
+      @extend %selected_items;
+    }
+  }
+}
+
+gridview {
+  > rubberband { @extend rubberband; }
+
+  > child {
+    padding: 3px;
+    transition: $focus_transition;
+
+    @include focus-ring();
+
+    &:selected {
+      outline-color: $alt_focus_border_color;
+
+      @extend %selected_items;
+
+      @if $contrast == 'high' {
+        box-shadow: inset 0 0 0 1px $borders_color;
+      }
+
+    }
+
+    box { //cells
+      border-spacing: 8px; //label separation
+      margin: 12px;
+    }
+  }
+}
+
+coverflow cover {
+  color: $text_color;
+  background-color: $base_color;
+  border: 1px solid black;
+}
+
+label {
+  @include focus-ring();
+
+  &.separator {
+    @extend .dim-label;
+  }
+
+  &:selected { @extend %nobg_selected_items; }
+
+  > selection {
+    background-color: $backdrop_selected_bg_color;
+    color: transparent;
+    &:focus-within {
+       background-color: $selected_text_bg_color;
+    }
+  }
+
+  &:disabled {
+    color: $insensitive_fg_color;
+
+    button & { color: inherit; }
+
+    > selection { @extend %selected_items_disabled; }
+  }
+
+  &.error {
+   color: $error_color;
+   &:disabled { color: transparentize($error_color,0.5); }
+  }
+}
+
+.dim-label {
+  opacity: $dim_label_opacity;
+  text-shadow: none;
+}
+
+window.assistant {
+  .sidebar {
+    padding: $menu-margin;
+    border-top: 1px solid $borders_color;
+  }
+
+  &.csd .sidebar { border-top-style: none; }
+
+  .sidebar > label { padding: 6px 12px; }
+
+  .sidebar > label.highlight {
+    background-color: $menu_selected_color;
+    border-radius: $menu-margin;
+  }
+}
+
+window.aboutdialog image.large-icons {
+  -gtk-icon-size: 128px;
+}
+
+%osd,
+.osd {
+  color: $osd_fg_color;
+  border: none;
+  background-color: $osd_bg_color;
+  background-clip: padding-box;
+  -gtk-icon-shadow: 0 1px black;
+
+}

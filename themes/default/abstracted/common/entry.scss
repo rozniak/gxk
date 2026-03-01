@@ -1,0 +1,54 @@
+//
+// Text entry widget styles
+//
+
+%entry,
+entry {
+  %entry_basic, & {
+    min-height: 32px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border: 1px solid;
+    border-radius: $button_radius;
+    border-spacing: 6px;
+    transition: all 200ms $ease-out-quad;
+
+    @include entry(normal);
+
+    @include focus-ring($focus-state: 'focus-within');
+
+    > image { // icons inside the entry
+      &.left { margin-right: 6px; }
+      &.right { margin-left: 6px; }
+    }
+
+    > text > placeholder {
+      @extend .dim-label;
+      @if $contrast == 'high' { font-style: italic; }
+    }
+
+    > text > block-cursor {
+      @include entry(block_cursor);
+    }
+
+    &.flat {
+      &:focus-within, &:backdrop, &:disabled, &:backdrop:disabled, & {
+        min-height: 0;
+        padding: 2px;
+        background-color: transparent;
+        border-color: transparent;
+        border-radius: 0;
+      }
+    }
+
+    &:focus-within {
+      @include entry(focus);
+      > placeholder {
+        opacity: 0; /* We hide placeholders on focus */
+      }
+    }
+
+    &:disabled { @include entry(insensitive); }
+
+    > text > selection {
+      background-color: $backdrop_selected_bg_color;

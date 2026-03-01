@@ -1,0 +1,46 @@
+//
+// Title buttons styles
+//
+
+windowcontrols {
+  border-spacing: 6px;
+
+  &:not(.empty) {
+    &.start:dir(ltr),
+    &.end:dir(rtl) {
+      margin-right: 7px;
+    }
+
+    &.start:dir(rtl),
+    &.end:dir(ltr) {
+      margin-left: 7px;
+    }
+  }
+
+  button {
+    @extend %button_basic_flat;
+
+    box-shadow: none;
+    border: none;
+    min-width: 34px;
+    padding: 0;
+
+    > image {
+        border-radius: 9999px;
+        min-height: 30px;
+        min-width: 30px;
+    }
+    &:hover > image {
+      //special case hover colors inside a headerbar
+      @include button(undecorated-hover,$c:darken($headerbar_bg_color,6%));
+    }
+    &:active > image,
+    &:checked > image { @include button(undecorated-active,$c:darken($headerbar_bg_color,10%)); }
+
+    &:hover,
+    &:active,
+    &:checked {
+        background: none;
+    }
+  }
+}

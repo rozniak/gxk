@@ -1,0 +1,58 @@
+//
+// Various toolbar styles
+//
+
+%toolbar {
+  padding: 4px;
+  border-spacing: 4px;
+  background-color: $bg_color;
+}
+
+.toolbar {
+  @extend %toolbar;
+
+  // on OSD
+  .osd & { background-color: transparent; }
+
+  // stand-alone OSD toolbars
+  &.osd {
+    padding: 13px;
+    border: none;
+    border-radius: 5px;
+    background-color: $osd_bg_color;
+
+    &.left,
+    &.right,
+    &.top,
+    &.bottom { border-radius: 0; } // positional classes for `attached` osd toolbars
+  }
+
+  // toolbar separators
+  &.horizontal > separator { margin: 4px 0; }
+  &.vertical > separator { margin: 0 4px; }
+}
+
+//searchbar & location-bar
+searchbar > revealer > box {
+  padding: 6px;
+  border-spacing: 6px;
+  @extend %toolbar;
+
+  @extend %darkbar;
+
+  border-width: 0 0 1px;
+}
+
+%darkbar {
+  border-style: solid;
+  border-color: $borders_color;
+  $_bg: mix($bg_color, $borders_color, 70%);
+  background-color: $_bg;
+
+  &:backdrop {
+    border-color: $backdrop_borders_color;
+    background-color: $backdrop_dark_fill;
+    box-shadow: none;
+    transition: $backdrop_transition;
+  }
+}
