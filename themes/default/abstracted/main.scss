@@ -5,6 +5,7 @@
 // Define the 'variant' here (light or dark)
 //
 $variant: 'light';
+$contrast: 'normal';
 
 // Import color definition constants
 //
@@ -16,8 +17,8 @@ $variant: 'light';
 
 // Import main theme styles
 //
-//@import "common/all";
+@import "common/all";
 
 // Import color definition exports (for third-party apps and WMs)
 //
-//@import "colors-public/all";
+@import "colors-public/all";
