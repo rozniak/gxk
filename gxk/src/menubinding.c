@@ -547,7 +547,12 @@ static void gxk_menu_binding_insert_item(
 
     if (label)
     {
-        GtkWidget* label_title = gtk_label_new(label);
+        GtkWidget* label_title = gtk_label_new(NULL);
+
+        gtk_label_set_text_with_mnemonic(
+            GTK_LABEL(label_title),
+            label
+        );
 
         gtk_label_set_xalign(GTK_LABEL(label_title), 0.0f);
 
