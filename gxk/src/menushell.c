@@ -40,15 +40,14 @@ void gxk_menu_shell_close_open_menus(
     iface->close_open_menus(menu_shell);
 }
 
-void gxk_menu_shell_prepend(
-    GxkMenuShell* menu_shell,
-    GtkWidget*    child
+GxkMenuShellKind gxk_menu_shell_get_kind(
+    GxkMenuShell* menu_shell
 )
 {
     GxkMenuShellInterface* iface =
         GXK_MENU_SHELL_GET_IFACE(menu_shell);
 
-    iface->prepend(menu_shell, child);
+    return iface->get_kind(menu_shell);
 }
 
 void gxk_menu_shell_insert(
@@ -63,14 +62,26 @@ void gxk_menu_shell_insert(
     iface->insert(menu_shell, child, position);
 }
 
-GxkMenuShellKind gxk_menu_shell_get_kind(
-    GxkMenuShell* menu_shell
+void gxk_menu_shell_prepend(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
 )
 {
     GxkMenuShellInterface* iface =
         GXK_MENU_SHELL_GET_IFACE(menu_shell);
 
-    return iface->get_kind(menu_shell);
+    iface->prepend(menu_shell, child);
+}
+
+void gxk_menu_shell_remove(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
+)
+{
+    GxkMenuShellInterface* iface =
+        GXK_MENU_SHELL_GET_IFACE(menu_shell);
+
+    iface->remove(menu_shell, child);
 }
 
 void gxk_menu_shell_set_active_item(

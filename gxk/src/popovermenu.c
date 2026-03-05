@@ -26,14 +26,18 @@ static void gxk_popover_menu_close_open_menus(
 static GxkMenuShellKind gxk_popover_menu_get_kind(
     GxkMenuShell* menu_shell
 );
-static void gxk_popover_menu_prepend(
-    GxkMenuShell* menu_shell,
-    GtkWidget*    child
-);
 static void gxk_popover_menu_insert(
     GxkMenuShell* menu_shell,
     GtkWidget*    child,
     gint          position
+);
+static void gxk_popover_menu_prepend(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
+);
+static void gxk_popover_menu_remove(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
 );
 static void gxk_popover_menu_set_active_item(
     GxkMenuShell* menu_shell,
@@ -118,6 +122,7 @@ static void gxk_popover_menu_menu_shell_interface_init(
     iface->get_kind         = gxk_popover_menu_get_kind;
     iface->prepend          = gxk_popover_menu_prepend;
     iface->insert           = gxk_popover_menu_insert;
+    iface->remove           = gxk_popover_menu_remove;
     iface->set_active_item  = gxk_popover_menu_set_active_item;
 }
 
@@ -179,19 +184,6 @@ static GxkMenuShellKind gxk_popover_menu_get_kind(
     return GXK_MENU_SHELL_MENU;
 }
 
-static void gxk_popover_menu_prepend(
-    GxkMenuShell* menu_shell,
-    GtkWidget*    child
-)
-{
-    GxkPopoverMenu* menu = GXK_POPOVER_MENU(menu_shell);
-
-    gtk_box_prepend(
-        GTK_BOX(menu->box_menuitems),
-        gxk_popover_menu_make_menu_item(menu, child)
-    );
-}
-
 static void gxk_popover_menu_insert(
     GxkMenuShell* menu_shell,
     GtkWidget*    child,
@@ -228,6 +220,33 @@ static void gxk_popover_menu_insert(
         gxk_popover_menu_make_menu_item(menu, child),
         sibling
     );
+}
+
+static void gxk_popover_menu_prepend(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
+)
+{
+    GxkPopoverMenu* menu = GXK_POPOVER_MENU(menu_shell);
+
+    gtk_box_prepend(
+        GTK_BOX(menu->box_menuitems),
+        gxk_popover_menu_make_menu_item(menu, child)
+    );
+}
+
+static void gxk_popover_menu_remove(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
+)
+{
+    if (gtk_widget_get_parent(child) != GTK_WIDGET(menu_shell))
+    {
+        g_critical("%s", "gxk: menu - invalid attempt to remove child");
+        return;
+    }
+
+    gtk_widget_unparent(child);
 }
 
 static void gxk_popover_menu_set_active_item(

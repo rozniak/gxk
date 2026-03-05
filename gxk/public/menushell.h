@@ -42,14 +42,18 @@ struct _GxkMenuShellInterface
     GxkMenuShellKind (*get_kind) (
         GxkMenuShell* menu_shell
     );
-    void (*prepend) (
-        GxkMenuShell* menu_shell,
-        GtkWidget*    child
-    );
     void (*insert) (
         GxkMenuShell* menu_shell,
         GtkWidget*    child,
         gint          position
+    );
+    void (*prepend) (
+        GxkMenuShell* menu_shell,
+        GtkWidget*    child
+    );
+    void (*remove) (
+        GxkMenuShell* menu_shell,
+        GtkWidget*    child
     );
     void (*set_active_item) (
         GxkMenuShell* menu_shell,
@@ -71,14 +75,18 @@ void gxk_menu_shell_close_open_menus(
 GxkMenuShellKind gxk_menu_shell_get_kind(
     GxkMenuShell* menu_shell
 );
-void gxk_menu_shell_prepend(
-    GxkMenuShell* menu_shell,
-    GtkWidget*    child
-);
 void gxk_menu_shell_insert(
     GxkMenuShell* menu_shell,
     GtkWidget*    child,
     gint          position
+);
+void gxk_menu_shell_prepend(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
+);
+void gxk_menu_shell_remove(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
 );
 void gxk_menu_shell_set_active_item(
     GxkMenuShell* menu_shell,

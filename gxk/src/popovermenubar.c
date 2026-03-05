@@ -50,14 +50,18 @@ static void gxk_popover_menu_bar_close_open_menus(
 static GxkMenuShellKind gxk_popover_menu_bar_get_kind(
     GxkMenuShell* menu_shell
 );
-static void gxk_popover_menu_bar_prepend(
-    GxkMenuShell* menu_shell,
-    GtkWidget*    child
-);
 static void gxk_popover_menu_bar_insert(
     GxkMenuShell* menu_shell,
     GtkWidget*    child,
     gint          position
+);
+static void gxk_popover_menu_bar_prepend(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
+);
+static void gxk_popover_menu_bar_remove(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
 );
 static void gxk_popover_menu_bar_set_active_item(
     GxkMenuShell* menu_shell,
@@ -186,8 +190,9 @@ static void gxk_popover_menu_bar_menu_shell_interface_init(
     iface->append           = gxk_popover_menu_bar_append;
     iface->close_open_menus = gxk_popover_menu_bar_close_open_menus;
     iface->get_kind         = gxk_popover_menu_bar_get_kind;
-    iface->prepend          = gxk_popover_menu_bar_prepend;
     iface->insert           = gxk_popover_menu_bar_insert;
+    iface->prepend          = gxk_popover_menu_bar_prepend;
+    iface->remove           = gxk_popover_menu_bar_remove;
     iface->set_active_item  = gxk_popover_menu_bar_set_active_item;
 }
 
@@ -304,20 +309,6 @@ static GxkMenuShellKind gxk_popover_menu_bar_get_kind(
     return GXK_MENU_SHELL_MENU_BAR;
 }
 
-static void gxk_popover_menu_bar_prepend(
-    GxkMenuShell* menu_shell,
-    GtkWidget*    child
-)
-{
-    GxkPopoverMenuBar* menu_bar = GXK_POPOVER_MENU_BAR(menu_shell);
-
-    gtk_widget_insert_after(
-        gxk_popover_menu_bar_make_menu_item(menu_bar, child),
-        GTK_WIDGET(menu_shell),
-        NULL
-    );
-}
-
 static void gxk_popover_menu_bar_insert(
     GxkMenuShell* menu_shell,
     GtkWidget*    child,
@@ -344,6 +335,34 @@ static void gxk_popover_menu_bar_insert(
         GTK_WIDGET(menu_shell),
         sibling
     );
+}
+
+static void gxk_popover_menu_bar_prepend(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
+)
+{
+    GxkPopoverMenuBar* menu_bar = GXK_POPOVER_MENU_BAR(menu_shell);
+
+    gtk_widget_insert_after(
+        gxk_popover_menu_bar_make_menu_item(menu_bar, child),
+        GTK_WIDGET(menu_shell),
+        NULL
+    );
+}
+
+static void gxk_popover_menu_bar_remove(
+    GxkMenuShell* menu_shell,
+    GtkWidget*    child
+)
+{
+    if (gtk_widget_get_parent(child) != GTK_WIDGET(menu_shell))
+    {
+        g_critical("%s", "gxk: menubar - invalid attempt to remove child");
+        return;
+    }
+
+    gtk_widget_unparent(child);
 }
 
 static void gxk_popover_menu_bar_set_active_item(
