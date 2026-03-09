@@ -22,6 +22,8 @@ add_library(
     gxk-4
     src/application.c
     public/application.h
+    src/ext-widget.c
+    public/ext-widget.h
     src/init.c
     public/init.h
     src/menubinding.c

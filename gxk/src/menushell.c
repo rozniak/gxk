@@ -50,6 +50,17 @@ GxkMenuShellKind gxk_menu_shell_get_kind(
     return iface->get_kind(menu_shell);
 }
 
+GtkWidget* gxk_menu_shell_get_nth_child(
+    GxkMenuShell* menu_shell,
+    gint          n
+)
+{
+    GxkMenuShellInterface* iface =
+        GXK_MENU_SHELL_GET_IFACE(menu_shell);
+
+    return iface->get_nth_child(menu_shell, n);
+}
+
 void gxk_menu_shell_insert(
     GxkMenuShell* menu_shell,
     GtkWidget*    child,

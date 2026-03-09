@@ -1,9 +1,10 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
-#include "../public/popovermenu.h"
+#include "../public/ext-widget.h"
 #include "../public/menuitem.h"
 #include "../public/menushell.h"
+#include "../public/popovermenu.h"
 
 //
 // FORWARD DECLARATIONS
@@ -25,6 +26,10 @@ static void gxk_popover_menu_close_open_menus(
 );
 static GxkMenuShellKind gxk_popover_menu_get_kind(
     GxkMenuShell* menu_shell
+);
+static GtkWidget* gxk_popover_menu_get_nth_child(
+    GxkMenuShell* menu_shell,
+    gint          n
 );
 static void gxk_popover_menu_insert(
     GxkMenuShell* menu_shell,
@@ -120,6 +125,7 @@ static void gxk_popover_menu_menu_shell_interface_init(
     iface->append           = gxk_popover_menu_append;
     iface->close_open_menus = gxk_popover_menu_close_open_menus;
     iface->get_kind         = gxk_popover_menu_get_kind;
+    iface->get_nth_child    = gxk_popover_menu_get_nth_child;
     iface->prepend          = gxk_popover_menu_prepend;
     iface->insert           = gxk_popover_menu_insert;
     iface->remove           = gxk_popover_menu_remove;
@@ -184,6 +190,17 @@ static GxkMenuShellKind gxk_popover_menu_get_kind(
     return GXK_MENU_SHELL_MENU;
 }
 
+static GtkWidget* gxk_popover_menu_get_nth_child(
+    GxkMenuShell* menu_shell,
+    gint          n
+)
+{
+    return gxkex_widget_get_nth_child(
+        GTK_WIDGET(menu_shell),
+        n
+    );
+}
+
 static void gxk_popover_menu_insert(
     GxkMenuShell* menu_shell,
     GtkWidget*    child,
@@ -192,33 +209,13 @@ static void gxk_popover_menu_insert(
 {
     GxkPopoverMenu* menu = GXK_POPOVER_MENU(menu_shell);
 
-    GtkWidget* sibling = NULL;
-
-    for (gint i = 0; i < position; i++)
-    {
-        GtkWidget* next;
-
-        if (i == 0)
-        {
-            next = gtk_widget_get_first_child(menu->box_menuitems);
-        }
-        else
-        {
-            next = gtk_widget_get_next_sibling(sibling);
-        }
-
-        if (!next)
-        {
-            break;
-        }
-
-        sibling = next;
-    }
-
     gtk_box_insert_child_after(
         GTK_BOX(menu->box_menuitems),
         gxk_popover_menu_make_menu_item(menu, child),
-        sibling
+        gxkex_widget_get_nth_child(
+            GTK_WIDGET(menu->box_menuitems),
+            position - 1
+        )
     );
 }
 

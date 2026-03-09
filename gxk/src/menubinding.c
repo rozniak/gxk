@@ -66,14 +66,14 @@ static void gxk_menu_binding_set_property(
 
 static GList* gxk_menu_binding_find_section_pos(
     GxkMenuBindingMenu* menu,
-    gint                     dst_pos,
-    gint*                    mid_pos
+    gint                dst_pos,
+    gint*               mid_pos
 );
 static void gxk_menu_binding_insert_item(
     GxkMenuBindingMenu* menu,
-    GMenuModel*	             menu_model,
-    gint                     src_pos,
-    gint                     dst_pos
+    GMenuModel*         menu_model,
+    gint                src_pos,
+    gint                dst_pos
 );
 static void gxk_menu_binding_remove_item(
     GxkMenuBindingMenu* menu,
@@ -276,8 +276,8 @@ GxkMenuBinding* gxk_menu_binding_new(
 //
 static GList* gxk_menu_binding_find_section_pos(
     GxkMenuBindingMenu* menu,
-    gint                     dst_pos,
-    gint*                    mid_pos
+    gint                dst_pos,
+    gint*               mid_pos
 )
 {
     gint   i    = 0;
@@ -330,9 +330,9 @@ static GList* gxk_menu_binding_find_section_pos(
 
 static void gxk_menu_binding_insert_item(
     GxkMenuBindingMenu* menu,
-    GMenuModel*	             menu_model,
-    gint                     src_pos,
-    gint                     dst_pos
+    GMenuModel*	        menu_model,
+    gint                src_pos,
+    gint                dst_pos
 )
 {
     gboolean is_menubar = GXK_IS_POPOVER_MENU_BAR(menu->menu_shell);
@@ -776,13 +776,13 @@ static void gxk_menu_binding_insert_item(
 
 static void gxk_menu_binding_remove_item(
     GxkMenuBindingMenu* menu,
-    GMenuModel*              menu_model,
-    gint                     src_pos
+    GMenuModel*         menu_model,
+    gint                src_pos
 )
 {
     gboolean is_subsection = menu_model != menu->menu_model;
 
-    // Let's fine the position of the item to bin!
+    // Let's find the position of the item to bin!
     //
     gint real_pos = 0;
 
@@ -805,15 +805,13 @@ static void gxk_menu_binding_remove_item(
 
                 check_section->item_count--;
 
-                //
-                // FIXME: GXK - THIS MUST BE IMPLEMENTED!!
-                //
-//                gtk_widget_destroy(
-//                    wintc_container_get_nth_child(
-//                        GTK_CONTAINER(menu->menu_shell),
-//                        real_pos
-//                    )
-//                );
+                gxk_menu_shell_remove(
+                    menu->menu_shell,
+                    gxk_menu_shell_get_nth_child(
+                        menu->menu_shell,
+                        real_pos
+                    )
+                );
 
                 // Handle when we just destroyed the last item in a section
                 //
@@ -848,15 +846,13 @@ static void gxk_menu_binding_remove_item(
                 {
                     for (gint j = 0; j < check_section->item_count; j++)
                     {
-                        //
-                        // FIXME: DITTO!
-                        //
-//                        gtk_widget_destroy(
-//                            wintc_container_get_nth_child(
-//                                GTK_CONTAINER(menu->menu_shell),
-//                                real_pos
-//                            )
-//                        );
+                        gxk_menu_shell_remove(
+                            menu->menu_shell,
+                            gxk_menu_shell_get_nth_child(
+                                menu->menu_shell,
+                                real_pos
+                            )
+                        );
                     }
 
                     menu->sections =
@@ -871,15 +867,13 @@ static void gxk_menu_binding_remove_item(
                 {
                     check_section->item_count--;
 
-                    //
-                    // FIXME: DITTO!!
-                    //
-//                    gtk_widget_destroy(
-//                        wintc_container_get_nth_child(
-//                            GTK_CONTAINER(menu->menu_shell),
-//                            real_pos
-//                        )
-//                    );
+                    gxk_menu_shell_remove(
+                        menu->menu_shell,
+                        gxk_menu_shell_get_nth_child(
+                            menu->menu_shell,
+                            real_pos
+                        )
+                    );
 
                     if (!(check_section->item_count))
                     {
@@ -913,15 +907,13 @@ static void gxk_menu_binding_remove_item(
 
                     check_section->item_count--;
 
-                    //
-                    // FIXME: DITTO!!
-                    //
-//                    gtk_widget_destroy(
-//                        wintc_container_get_nth_child(
-//                            GTK_CONTAINER(menu->menu_shell),
-//                            real_pos
-//                        )
-//                    );
+                    gxk_menu_shell_remove(
+                        menu->menu_shell,
+                        gxk_menu_shell_get_nth_child(
+                            menu->menu_shell,
+                            real_pos
+                        )
+                    );
 
                     return;
                 }

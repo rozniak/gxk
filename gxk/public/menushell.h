@@ -42,6 +42,10 @@ struct _GxkMenuShellInterface
     GxkMenuShellKind (*get_kind) (
         GxkMenuShell* menu_shell
     );
+    GtkWidget* (*get_nth_child) (
+        GxkMenuShell* menu_shell,
+        gint          n
+    );
     void (*insert) (
         GxkMenuShell* menu_shell,
         GtkWidget*    child,
@@ -74,6 +78,10 @@ void gxk_menu_shell_close_open_menus(
 );
 GxkMenuShellKind gxk_menu_shell_get_kind(
     GxkMenuShell* menu_shell
+);
+GtkWidget* gxk_menu_shell_get_nth_child(
+    GxkMenuShell* menu_shell,
+    gint          n
 );
 void gxk_menu_shell_insert(
     GxkMenuShell* menu_shell,
